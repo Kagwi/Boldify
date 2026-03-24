@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, X, Heart, Filter } from 'lucide-react';
-import { Product, Category, Subcategory, supabase } from '../lib/supabase';
+import { supabase, Product, Category, Subcategory } from '../lib/supabase';
 
 interface ShopPageProps {
   onWishlistChange: (count: number) => void;
@@ -29,7 +29,10 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
   }, [products, selectedCategory, selectedSubcategory, searchQuery, priceRange]);
 
   const fetchProducts = async () => {
-    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+    const { data } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
     if (data) setProducts(data);
   };
 
@@ -48,12 +51,16 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
 
     if (selectedCategory) {
       const category = categories.find((c) => c.slug === selectedCategory);
-      if (category) filtered = filtered.filter((p) => p.category_id === category.id);
+      if (category) {
+        filtered = filtered.filter((p) => p.category_id === category.id);
+      }
     }
 
     if (selectedSubcategory) {
       const subcategory = subcategories.find((s) => s.slug === selectedSubcategory);
-      if (subcategory) filtered = filtered.filter((p) => p.subcategory_id === subcategory.id);
+      if (subcategory) {
+        filtered = filtered.filter((p) => p.subcategory_id === subcategory.id);
+      }
     }
 
     if (searchQuery) {
@@ -78,8 +85,11 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
 
   const toggleWishlist = (productId: string) => {
     const newWishlist = new Set(wishlist);
-    if (newWishlist.has(productId)) newWishlist.delete(productId);
-    else newWishlist.add(productId);
+    if (newWishlist.has(productId)) {
+      newWishlist.delete(productId);
+    } else {
+      newWishlist.add(productId);
+    }
     setWishlist(newWishlist);
     onWishlistChange(newWishlist.size);
   };
@@ -96,6 +106,12 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
     return `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
   };
 
+  // Automatically generate image path based on category/subcategory/product name
+  const getImagePath = (product: Product) => {
+    const categorySlug = categories.find((c) => c.id === product.category_id)?.slug || 'others';
+    return `/images/${categorySlug}/${product.image_name.toLowerCase().replace(/ /g, '-')}.jpeg`;
+  };
+
   const availableSubcategories = selectedCategory
     ? subcategories.filter((s) => {
         const category = categories.find((c) => c.slug === selectedCategory);
@@ -103,75 +119,26 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
       })
     : [];
 
-  // --- MANUAL IMAGE MAPPING ---
-  const imageMap: Record<string, string> = {
-    // Bangles
-    'Bangles': '/images/bangles/bangles.jpg',
-    'Bangles 1': '/images/bangles/bangles1.jpg',
-    'Bangles 2': '/images/bangles/bangles2.jpg',
-    'Bangles 3': '/images/bangles/bangles3.jpg',
-    'Bangles 4': '/images/bangles/bangles4.jpg',
-    'Bangles 5': '/images/bangles/bangles5.jpg',
-    // Necklaces
-    'Double Layered Necklace': '/images/necklaces/doublenecklace.jpg',
-    'Double Layered Necklace 1': '/images/necklaces/doublenecklace1.jpg',
-    'Double Layered Necklace 2': '/images/necklaces/doublenecklace2.jpg',
-    'Necklace': '/images/necklaces/necklace.jpg',
-    'Necklace 1': '/images/necklaces/necklace1.jpg',
-    'Necklace 2': '/images/necklaces/necklace2.jpg',
-    'Necklace 3': '/images/necklaces/necklace3.jpg',
-    'Necklace 4': '/images/necklaces/necklace4.jpg',
-    'Necklace 5': '/images/necklaces/necklace5.jpg',
-    'Necklace 6': '/images/necklaces/necklace6.jpg',
-    'Necklace 7': '/images/necklaces/necklace7.jpg',
-    'Necklace 8': '/images/necklaces/necklace8.jpg',
-    'Necklace 9': '/images/necklaces/necklace9.jpg',
-    // Sets
-    'Sets': '/images/sets/sets.jpg',
-    'Sets 1': '/images/sets/sets1.jpg',
-    'Sets 2': '/images/sets/sets2.jpg',
-    'Sets 3': '/images/sets/sets3.jpg',
-    'Sets 4': '/images/sets/sets4.jpg',
-    // Statement Earrings
-    'Statement Earrings': '/images/statementearrings/statementearrings.jpg',
-    'Statement Earrings 1': '/images/statementearrings/statementearrings1.jpg',
-    'Statement Earrings 2': '/images/statementearrings/statementearrings2.jpg',
-    'Statement Earrings 3': '/images/statementearrings/statementearrings3.jpg',
-    'Statement Earrings 4': '/images/statementearrings/statementearrings4.jpg',
-    'Statement Earrings 5': '/images/statementearrings/statementearrings5.jpg',
-    'Statement Earrings 6': '/images/statementearrings/statementearrings6.jpg',
-    'Statement Earrings 7': '/images/statementearrings/statementearrings7.jpg',
-    'Statement Earrings 8': '/images/statementearrings/statementearrings8.jpg',
-    'Statement Earrings 9': '/images/statementearrings/statementearrings9.jpg',
-    'Statement Earrings 10': '/images/statementearrings/statementearrings10.jpg',
-    'Statement Earrings 11': '/images/statementearrings/statementearrings11.jpg',
-    'Statement Earrings 12': '/images/statementearrings/statementearrings12.jpg',
-    'Statement Earrings 13': '/images/statementearrings/statementearrings13.jpg',
-    'Statement Earrings 14': '/images/statementearrings/statementearrings14.jpg',
-    'Statement Earrings 15': '/images/statementearrings/statementearrings15.jpg',
-    'Statement Earrings 16': '/images/statementearrings/statementearrings16.jpg',
-    'Statement Earrings 17': '/images/statementearrings/statementearrings17.jpg',
-    'Statement Earrings 18': '/images/statementearrings/statementearrings18.jpg',
-    'Statement Earrings 19': '/images/statementearrings/statementearrings19.jpg'
-  };
-
-  const getLocalImage = (product: Product) => {
-    return imageMap[product.name] || '/images/placeholder.jpg'; // fallback if missing
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black pt-20">
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-gold text-center mb-4" style={{ fontFamily: 'Jolt, serif' }}>
+        {/* Header */}
+        <div className="mb-12 text-center">
+          <h1
+            className="text-4xl md:text-6xl font-bold text-gold mb-4"
+            style={{ fontFamily: 'Jolt, serif' }}
+          >
             Shop Collection
           </h1>
-          <p className="text-gray-400 text-center text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
+          <p
+            className="text-gray-400 text-lg"
+            style={{ fontFamily: 'Playfair Display, serif' }}
+          >
             Discover pieces that speak to your bold spirit
           </p>
         </div>
 
-        {/* Search + Filters */}
+        {/* Search & Filter */}
         <div className="mb-8 flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -194,10 +161,16 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
           </button>
         </div>
 
+        {/* Filters Panel */}
         {showFilters && (
           <div className="mb-8 bg-gray-900/50 border border-gray-800 p-6">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-gold" style={{ fontFamily: 'Playfair Display, serif' }}>Filter By</h3>
+              <h3
+                className="text-xl font-bold text-gold"
+                style={{ fontFamily: 'Playfair Display, serif' }}
+              >
+                Filter By
+              </h3>
               <button
                 onClick={clearFilters}
                 className="text-gray-400 hover:text-gold transition-colors flex items-center space-x-2"
@@ -209,21 +182,40 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
+              {/* Category */}
               <div>
-                <label className="block text-white mb-3 font-bold" style={{ fontFamily: 'Marcellus, serif' }}>Category</label>
+                <label
+                  className="block text-white mb-3 font-bold"
+                  style={{ fontFamily: 'Marcellus, serif' }}
+                >
+                  Category
+                </label>
                 <select
                   value={selectedCategory}
-                  onChange={(e) => { setSelectedCategory(e.target.value); setSelectedSubcategory(''); }}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    setSelectedSubcategory('');
+                  }}
                   className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors"
                   style={{ fontFamily: 'Marcellus, serif' }}
                 >
                   <option value="">All Categories</option>
-                  {categories.map(c => <option key={c.id} value={c.slug}>{c.name}</option>)}
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.slug}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
+              {/* Subcategory */}
               <div>
-                <label className="block text-white mb-3 font-bold" style={{ fontFamily: 'Marcellus, serif' }}>Subcategory</label>
+                <label
+                  className="block text-white mb-3 font-bold"
+                  style={{ fontFamily: 'Marcellus, serif' }}
+                >
+                  Subcategory
+                </label>
                 <select
                   value={selectedSubcategory}
                   onChange={(e) => setSelectedSubcategory(e.target.value)}
@@ -232,12 +224,22 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
                   style={{ fontFamily: 'Marcellus, serif' }}
                 >
                   <option value="">All Subcategories</option>
-                  {availableSubcategories.map(s => <option key={s.id} value={s.slug}>{s.name}</option>)}
+                  {availableSubcategories.map((subcategory) => (
+                    <option key={subcategory.id} value={subcategory.slug}>
+                      {subcategory.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
+              {/* Price */}
               <div>
-                <label className="block text-white mb-3 font-bold" style={{ fontFamily: 'Marcellus, serif' }}>Price Range</label>
+                <label
+                  className="block text-white mb-3 font-bold"
+                  style={{ fontFamily: 'Marcellus, serif' }}
+                >
+                  Price Range
+                </label>
                 <select
                   value={priceRange}
                   onChange={(e) => setPriceRange(e.target.value)}
@@ -254,7 +256,18 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
           </div>
         )}
 
-        {/* Products */}
+        {/* Products Grid */}
+        <div className="mb-6 flex justify-between items-center">
+          <p className="text-gray-400" style={{ fontFamily: 'Marcellus, serif' }}>
+            Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+          </p>
+          {wishlist.size > 0 && (
+            <p className="text-gold" style={{ fontFamily: 'Marcellus, serif' }}>
+              {wishlist.size} in wishlist
+            </p>
+          )}
+        </div>
+
         {filteredProducts.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-gray-400 text-xl" style={{ fontFamily: 'Marcellus, serif' }}>
@@ -263,34 +276,52 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-            {filteredProducts.map(product => (
-              <div key={product.id} className="group cursor-pointer overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold transition-all duration-300">
+            {filteredProducts.map((product) => (
+              <div
+                key={product.id}
+                className="group cursor-pointer overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold transition-all duration-300 rounded-xl shadow-lg"
+              >
                 <div className="relative h-64 md:h-80 overflow-hidden">
                   <img
-                    src={getLocalImage(product)}
+                    src={getImagePath(product)}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                   <button
                     onClick={() => toggleWishlist(product.id)}
-                    className="absolute top-4 right-4 bg-black/50 hover:bg-black p-2 transition-colors duration-300"
+                    className="absolute top-4 right-4 bg-black/50 hover:bg-black p-2 transition-colors duration-300 rounded-full"
                   >
-                    <Heart className={`h-5 w-5 ${wishlist.has(product.id) ? 'text-gold fill-gold' : 'text-white'}`} />
+                    <Heart
+                      className={`h-5 w-5 ${wishlist.has(product.id) ? 'text-gold fill-gold' : 'text-white'}`}
+                    />
                   </button>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
                 <div className="p-4 md:p-6">
-                  <h3 className="text-lg md:text-xl font-bold text-white mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>{product.name}</h3>
-                  <p className="text-gray-400 text-xs md:text-sm mb-4 line-clamp-2" style={{ fontFamily: 'Marcellus, serif' }}>{product.description}</p>
+                  <h3
+                    className="text-lg md:text-xl font-bold text-white mb-2"
+                    style={{ fontFamily: 'Playfair Display, serif' }}
+                  >
+                    {product.name}
+                  </h3>
+                  <p
+                    className="text-gray-400 text-xs md:text-sm mb-4 line-clamp-2"
+                    style={{ fontFamily: 'Marcellus, serif' }}
+                  >
+                    {product.description}
+                  </p>
                   <div className="flex flex-col space-y-3">
-                    <span className="text-xl md:text-2xl font-bold text-gold" style={{ fontFamily: 'Jolt, serif' }}>
+                    <span
+                      className="text-xl md:text-2xl font-bold text-gold"
+                      style={{ fontFamily: 'Jolt, serif' }}
+                    >
                       Ksh {product.price.toLocaleString()}
                     </span>
                     <a
                       href={getWhatsAppLink(product)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-gold text-black px-4 py-2 text-sm font-bold hover:bg-gold/90 transition-colors duration-300 text-center"
+                      className="bg-gold text-black px-4 py-2 text-sm font-bold hover:bg-gold/90 transition-colors duration-300 text-center rounded"
                     >
                       ORDER VIA WHATSAPP
                     </a>
@@ -302,11 +333,10 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
         )}
       </div>
 
-      {/* Footer */}
       <footer className="bg-black border-t border-gold/20 py-8 px-4 mt-20">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-gray-400" style={{ fontFamily: 'Marcellus, serif' }}>
-            © 2024 Boldify Jewellery.Ke. All rights reserved.
+            © 2026 Boldify Jewellery.Ke. All rights reserved.
           </p>
         </div>
       </footer>
