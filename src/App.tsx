@@ -30,6 +30,4 @@ function App() {
   );
 }
 
-VITE_SUPABASE_URL = https://bmeyzpqrwtzqsxwbcded.supabase.co
-VITE_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtZXl6cHFyd3R6cXN4d2JjZGVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNTg3MTYsImV4cCI6MjA4OTkzNDcxNn0.zXkShsfzf_Qm7qv2h38BbnLXENW6KXTlcpSgx5jvXGc
 export default App;
