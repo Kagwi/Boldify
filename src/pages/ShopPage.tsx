@@ -324,7 +324,7 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
       <footer className="bg-black border-t border-gold/20 py-8 px-4 mt-20">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-gray-400" style={{ fontFamily: 'Marcellus, serif' }}>
-            © 2024 Boldify Jewellery.Ke. All rights reserved.
+            © 2026 Boldify Jewellery.Ke. All rights reserved.
           </p>
         </div>
       </footer>
