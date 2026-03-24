@@ -103,18 +103,60 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
       })
     : [];
 
-  // --- NEW: LOCAL IMAGE FUNCTION WITH CATEGORIES ---
+  // --- MANUAL IMAGE MAPPING ---
+  const imageMap: Record<string, string> = {
+    // Bangles
+    'Bangles': '/images/bangles/bangles.jpg',
+    'Bangles 1': '/images/bangles/bangles1.jpg',
+    'Bangles 2': '/images/bangles/bangles2.jpg',
+    'Bangles 3': '/images/bangles/bangles3.jpg',
+    'Bangles 4': '/images/bangles/bangles4.jpg',
+    'Bangles 5': '/images/bangles/bangles5.jpg',
+    // Necklaces
+    'Double Layered Necklace': '/images/necklaces/doublenecklace.jpg',
+    'Double Layered Necklace 1': '/images/necklaces/doublenecklace1.jpg',
+    'Double Layered Necklace 2': '/images/necklaces/doublenecklace2.jpg',
+    'Necklace': '/images/necklaces/necklace.jpg',
+    'Necklace 1': '/images/necklaces/necklace1.jpg',
+    'Necklace 2': '/images/necklaces/necklace2.jpg',
+    'Necklace 3': '/images/necklaces/necklace3.jpg',
+    'Necklace 4': '/images/necklaces/necklace4.jpg',
+    'Necklace 5': '/images/necklaces/necklace5.jpg',
+    'Necklace 6': '/images/necklaces/necklace6.jpg',
+    'Necklace 7': '/images/necklaces/necklace7.jpg',
+    'Necklace 8': '/images/necklaces/necklace8.jpg',
+    'Necklace 9': '/images/necklaces/necklace9.jpg',
+    // Sets
+    'Sets': '/images/sets/sets.jpg',
+    'Sets 1': '/images/sets/sets1.jpg',
+    'Sets 2': '/images/sets/sets2.jpg',
+    'Sets 3': '/images/sets/sets3.jpg',
+    'Sets 4': '/images/sets/sets4.jpg',
+    // Statement Earrings
+    'Statement Earrings': '/images/statementearrings/statementearrings.jpg',
+    'Statement Earrings 1': '/images/statementearrings/statementearrings1.jpg',
+    'Statement Earrings 2': '/images/statementearrings/statementearrings2.jpg',
+    'Statement Earrings 3': '/images/statementearrings/statementearrings3.jpg',
+    'Statement Earrings 4': '/images/statementearrings/statementearrings4.jpg',
+    'Statement Earrings 5': '/images/statementearrings/statementearrings5.jpg',
+    'Statement Earrings 6': '/images/statementearrings/statementearrings6.jpg',
+    'Statement Earrings 7': '/images/statementearrings/statementearrings7.jpg',
+    'Statement Earrings 8': '/images/statementearrings/statementearrings8.jpg',
+    'Statement Earrings 9': '/images/statementearrings/statementearrings9.jpg',
+    'Statement Earrings 10': '/images/statementearrings/statementearrings10.jpg',
+    'Statement Earrings 11': '/images/statementearrings/statementearrings11.jpg',
+    'Statement Earrings 12': '/images/statementearrings/statementearrings12.jpg',
+    'Statement Earrings 13': '/images/statementearrings/statementearrings13.jpg',
+    'Statement Earrings 14': '/images/statementearrings/statementearrings14.jpg',
+    'Statement Earrings 15': '/images/statementearrings/statementearrings15.jpg',
+    'Statement Earrings 16': '/images/statementearrings/statementearrings16.jpg',
+    'Statement Earrings 17': '/images/statementearrings/statementearrings17.jpg',
+    'Statement Earrings 18': '/images/statementearrings/statementearrings18.jpg',
+    'Statement Earrings 19': '/images/statementearrings/statementearrings19.jpg'
+  };
+
   const getLocalImage = (product: Product) => {
-    const categoryFolderMap: Record<string, string> = {
-      bangles: 'bangles',
-      necklaces: 'necklaces',
-      sets: 'sets',
-      statementearrings: 'statementearrings',
-    };
-    const categorySlug = categories.find(c => c.id === product.category_id)?.slug || 'others';
-    const folder = categoryFolderMap[categorySlug] || 'others';
-    const fileName = product.name.toLowerCase().replace(/\s+/g, '') + '.jpg';
-    return `/images/${folder}/${fileName}`;
+    return imageMap[product.name] || '/images/placeholder.jpg'; // fallback if missing
   };
 
   return (
