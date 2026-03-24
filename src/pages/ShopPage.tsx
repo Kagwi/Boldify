@@ -51,23 +51,19 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
 
     if (selectedCategory) {
       const category = categories.find((c) => c.slug === selectedCategory);
-      if (category) {
-        filtered = filtered.filter((p) => p.category_id === category.id);
-      }
+      if (category) filtered = filtered.filter((p) => p.category_id === category.id);
     }
 
     if (selectedSubcategory) {
       const subcategory = subcategories.find((s) => s.slug === selectedSubcategory);
-      if (subcategory) {
-        filtered = filtered.filter((p) => p.subcategory_id === subcategory.id);
-      }
+      if (subcategory) filtered = filtered.filter((p) => p.subcategory_id === subcategory.id);
     }
 
     if (searchQuery) {
       filtered = filtered.filter(
         (p) =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.description.toLowerCase().includes(searchQuery.toLowerCase())
+          (p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+          (p.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
       );
     }
 
@@ -85,11 +81,8 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
 
   const toggleWishlist = (productId: string) => {
     const newWishlist = new Set(wishlist);
-    if (newWishlist.has(productId)) {
-      newWishlist.delete(productId);
-    } else {
-      newWishlist.add(productId);
-    }
+    if (newWishlist.has(productId)) newWishlist.delete(productId);
+    else newWishlist.add(productId);
     setWishlist(newWishlist);
     onWishlistChange(newWishlist.size);
   };
@@ -101,15 +94,24 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
     setPriceRange('all');
   };
 
-  const getWhatsAppLink = (product: Product) => {
-    const message = `Hi, I'm interested in ${product.name} (Ksh ${product.price.toLocaleString()})`;
-    return `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
+  // ✅ Safe image path function
+  const getImagePath = (product: Product) => {
+    try {
+      const categorySlug =
+        categories.find((c) => c.id === product.category_id)?.slug || 'others';
+      const imageName = product.image_name
+        ? product.image_name.toLowerCase().replace(/ /g, '-')
+        : 'default.jpeg';
+      return `/images/${categorySlug}/${imageName}`;
+    } catch (err) {
+      console.warn('Error generating image path for product:', product.name);
+      return '/images/default.jpeg';
+    }
   };
 
-  // Automatically generate image path based on category/subcategory/product name
-  const getImagePath = (product: Product) => {
-    const categorySlug = categories.find((c) => c.id === product.category_id)?.slug || 'others';
-    return `/images/${categorySlug}/${product.image_name.toLowerCase().replace(/ /g, '-')}.jpeg`;
+  const getWhatsAppLink = (product: Product) => {
+    const message = `Hi, I'm interested in ${product.name} (Ksh ${product.price?.toLocaleString()})`;
+    return `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
   };
 
   const availableSubcategories = selectedCategory
@@ -138,7 +140,7 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
           </p>
         </div>
 
-        {/* Search & Filter */}
+        {/* Search + Filter */}
         <div className="mb-8 flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -163,7 +165,7 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
 
         {/* Filters Panel */}
         {showFilters && (
-          <div className="mb-8 bg-gray-900/50 border border-gray-800 p-6">
+          <div className="mb-8 bg-gray-900/50 border border-gray-800 p-6 rounded-lg">
             <div className="flex justify-between items-center mb-6">
               <h3
                 className="text-xl font-bold text-gold"
@@ -182,14 +184,8 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
-              {/* Category */}
               <div>
-                <label
-                  className="block text-white mb-3 font-bold"
-                  style={{ fontFamily: 'Marcellus, serif' }}
-                >
-                  Category
-                </label>
+                <label className="block text-white mb-3 font-bold">Category</label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => {
@@ -197,7 +193,6 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
                     setSelectedSubcategory('');
                   }}
                   className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors"
-                  style={{ fontFamily: 'Marcellus, serif' }}
                 >
                   <option value="">All Categories</option>
                   {categories.map((category) => (
@@ -208,20 +203,13 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
                 </select>
               </div>
 
-              {/* Subcategory */}
               <div>
-                <label
-                  className="block text-white mb-3 font-bold"
-                  style={{ fontFamily: 'Marcellus, serif' }}
-                >
-                  Subcategory
-                </label>
+                <label className="block text-white mb-3 font-bold">Subcategory</label>
                 <select
                   value={selectedSubcategory}
                   onChange={(e) => setSelectedSubcategory(e.target.value)}
                   disabled={!selectedCategory}
                   className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors disabled:opacity-50"
-                  style={{ fontFamily: 'Marcellus, serif' }}
                 >
                   <option value="">All Subcategories</option>
                   {availableSubcategories.map((subcategory) => (
@@ -232,19 +220,12 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
                 </select>
               </div>
 
-              {/* Price */}
               <div>
-                <label
-                  className="block text-white mb-3 font-bold"
-                  style={{ fontFamily: 'Marcellus, serif' }}
-                >
-                  Price Range
-                </label>
+                <label className="block text-white mb-3 font-bold">Price Range</label>
                 <select
                   value={priceRange}
                   onChange={(e) => setPriceRange(e.target.value)}
                   className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors"
-                  style={{ fontFamily: 'Marcellus, serif' }}
                 >
                   <option value="all">All Prices</option>
                   <option value="under-5000">Under Ksh 5,000</option>
@@ -256,23 +237,20 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
           </div>
         )}
 
-        {/* Products Grid */}
+        {/* Products */}
         <div className="mb-6 flex justify-between items-center">
-          <p className="text-gray-400" style={{ fontFamily: 'Marcellus, serif' }}>
-            Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+          <p className="text-gray-400">
+            Showing {filteredProducts.length}{' '}
+            {filteredProducts.length === 1 ? 'product' : 'products'}
           </p>
           {wishlist.size > 0 && (
-            <p className="text-gold" style={{ fontFamily: 'Marcellus, serif' }}>
-              {wishlist.size} in wishlist
-            </p>
+            <p className="text-gold">{wishlist.size} in wishlist</p>
           )}
         </div>
 
         {filteredProducts.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-400 text-xl" style={{ fontFamily: 'Marcellus, serif' }}>
-              No products found. Try adjusting your filters.
-            </p>
+          <div className="text-center py-20 text-gray-400 text-xl">
+            No products found. Try adjusting your filters.
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
@@ -292,36 +270,29 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
                     className="absolute top-4 right-4 bg-black/50 hover:bg-black p-2 transition-colors duration-300 rounded-full"
                   >
                     <Heart
-                      className={`h-5 w-5 ${wishlist.has(product.id) ? 'text-gold fill-gold' : 'text-white'}`}
+                      className={`h-5 w-5 ${
+                        wishlist.has(product.id) ? 'text-gold fill-gold' : 'text-white'
+                      }`}
                     />
                   </button>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
                 <div className="p-4 md:p-6">
-                  <h3
-                    className="text-lg md:text-xl font-bold text-white mb-2"
-                    style={{ fontFamily: 'Playfair Display, serif' }}
-                  >
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-2">
                     {product.name}
                   </h3>
-                  <p
-                    className="text-gray-400 text-xs md:text-sm mb-4 line-clamp-2"
-                    style={{ fontFamily: 'Marcellus, serif' }}
-                  >
+                  <p className="text-gray-400 text-xs md:text-sm mb-4 line-clamp-2">
                     {product.description}
                   </p>
                   <div className="flex flex-col space-y-3">
-                    <span
-                      className="text-xl md:text-2xl font-bold text-gold"
-                      style={{ fontFamily: 'Jolt, serif' }}
-                    >
-                      Ksh {product.price.toLocaleString()}
+                    <span className="text-xl md:text-2xl font-bold text-gold">
+                      Ksh {product.price?.toLocaleString() ?? '0'}
                     </span>
                     <a
                       href={getWhatsAppLink(product)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-gold text-black px-4 py-2 text-sm font-bold hover:bg-gold/90 transition-colors duration-300 text-center rounded"
+                      className="bg-gold text-black px-4 py-2 text-sm font-bold hover:bg-gold/90 transition-colors duration-300 text-center rounded-lg"
                     >
                       ORDER VIA WHATSAPP
                     </a>
@@ -333,12 +304,8 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
         )}
       </div>
 
-      <footer className="bg-black border-t border-gold/20 py-8 px-4 mt-20">
-        <div className="max-w-7xl mx-auto text-center">
-          <p className="text-gray-400" style={{ fontFamily: 'Marcellus, serif' }}>
-            © 2026 Boldify Jewellery.Ke. All rights reserved.
-          </p>
-        </div>
+      <footer className="bg-black border-t border-gold/20 py-8 px-4 mt-20 text-center text-gray-400">
+        © 2026 Boldify Jewellery.Ke. All rights reserved.
       </footer>
     </div>
   );
