@@ -30,25 +30,4 @@ function App() {
   );
 }
 
-useEffect(() => {
-  const testConnection = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .limit(1);
-      
-      if (error) {
-        console.error('❌ Database Error:', error);
-      } else {
-        console.log('✅ Database Connected! Categories:', data);
-      }
-    } catch (err) {
-      console.error('❌ Connection Failed:', err);
-    }
-  };
-  
-  testConnection();
-}, []);
-
 export default App;
