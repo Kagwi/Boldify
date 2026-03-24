@@ -29,7 +29,6 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
   }, [products, selectedCategory, selectedSubcategory, searchQuery, priceRange]);
 
   const fetchProducts = async () => {
-    // Keep fetching products from Supabase
     const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
     if (data) setProducts(data);
   };
@@ -104,10 +103,18 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
       })
     : [];
 
-  // --- NEW FUNCTION TO CONVERT PRODUCT NAME TO LOCAL IMAGE PATH ---
-  const getLocalImage = (productName: string) => {
-    const fileName = productName.toLowerCase().replace(/\s+/g, '') + '.jpg';
-    return `/images/${fileName}`;
+  // --- NEW: LOCAL IMAGE FUNCTION WITH CATEGORIES ---
+  const getLocalImage = (product: Product) => {
+    const categoryFolderMap: Record<string, string> = {
+      bangles: 'bangles',
+      necklaces: 'necklaces',
+      sets: 'sets',
+      statementearrings: 'statementearrings',
+    };
+    const categorySlug = categories.find(c => c.id === product.category_id)?.slug || 'others';
+    const folder = categoryFolderMap[categorySlug] || 'others';
+    const fileName = product.name.toLowerCase().replace(/\s+/g, '') + '.jpg';
+    return `/images/${folder}/${fileName}`;
   };
 
   return (
@@ -122,7 +129,7 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
           </p>
         </div>
 
-        {/* Search and Filter UI */}
+        {/* Search + Filters */}
         <div className="mb-8 flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -145,15 +152,67 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
           </button>
         </div>
 
-        {/* Filters Section */}
         {showFilters && (
           <div className="mb-8 bg-gray-900/50 border border-gray-800 p-6">
-            {/* Category, Subcategory, Price */}
-            {/* ...same as your existing code... */}
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-gold" style={{ fontFamily: 'Playfair Display, serif' }}>Filter By</h3>
+              <button
+                onClick={clearFilters}
+                className="text-gray-400 hover:text-gold transition-colors flex items-center space-x-2"
+                style={{ fontFamily: 'Marcellus, serif' }}
+              >
+                <X className="h-4 w-4" />
+                <span>Clear All</span>
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-white mb-3 font-bold" style={{ fontFamily: 'Marcellus, serif' }}>Category</label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => { setSelectedCategory(e.target.value); setSelectedSubcategory(''); }}
+                  className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors"
+                  style={{ fontFamily: 'Marcellus, serif' }}
+                >
+                  <option value="">All Categories</option>
+                  {categories.map(c => <option key={c.id} value={c.slug}>{c.name}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-white mb-3 font-bold" style={{ fontFamily: 'Marcellus, serif' }}>Subcategory</label>
+                <select
+                  value={selectedSubcategory}
+                  onChange={(e) => setSelectedSubcategory(e.target.value)}
+                  disabled={!selectedCategory}
+                  className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors disabled:opacity-50"
+                  style={{ fontFamily: 'Marcellus, serif' }}
+                >
+                  <option value="">All Subcategories</option>
+                  {availableSubcategories.map(s => <option key={s.id} value={s.slug}>{s.name}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-white mb-3 font-bold" style={{ fontFamily: 'Marcellus, serif' }}>Price Range</label>
+                <select
+                  value={priceRange}
+                  onChange={(e) => setPriceRange(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors"
+                  style={{ fontFamily: 'Marcellus, serif' }}
+                >
+                  <option value="all">All Prices</option>
+                  <option value="under-5000">Under Ksh 5,000</option>
+                  <option value="5000-10000">Ksh 5,000 - 10,000</option>
+                  <option value="over-10000">Over Ksh 10,000</option>
+                </select>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Products Grid */}
+        {/* Products */}
         {filteredProducts.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-gray-400 text-xl" style={{ fontFamily: 'Marcellus, serif' }}>
@@ -162,15 +221,11 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-            {filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="group cursor-pointer overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold transition-all duration-300"
-              >
+            {filteredProducts.map(product => (
+              <div key={product.id} className="group cursor-pointer overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold transition-all duration-300">
                 <div className="relative h-64 md:h-80 overflow-hidden">
-                  {/* USE LOCAL IMAGE */}
                   <img
-                    src={getLocalImage(product.name)}
+                    src={getLocalImage(product)}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
@@ -178,21 +233,13 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
                     onClick={() => toggleWishlist(product.id)}
                     className="absolute top-4 right-4 bg-black/50 hover:bg-black p-2 transition-colors duration-300"
                   >
-                    <Heart
-                      className={`h-5 w-5 ${
-                        wishlist.has(product.id) ? 'text-gold fill-gold' : 'text-white'
-                      }`}
-                    />
+                    <Heart className={`h-5 w-5 ${wishlist.has(product.id) ? 'text-gold fill-gold' : 'text-white'}`} />
                   </button>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
                 <div className="p-4 md:p-6">
-                  <h3 className="text-lg md:text-xl font-bold text-white mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-400 text-xs md:text-sm mb-4 line-clamp-2" style={{ fontFamily: 'Marcellus, serif' }}>
-                    {product.description}
-                  </p>
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>{product.name}</h3>
+                  <p className="text-gray-400 text-xs md:text-sm mb-4 line-clamp-2" style={{ fontFamily: 'Marcellus, serif' }}>{product.description}</p>
                   <div className="flex flex-col space-y-3">
                     <span className="text-xl md:text-2xl font-bold text-gold" style={{ fontFamily: 'Jolt, serif' }}>
                       Ksh {product.price.toLocaleString()}
