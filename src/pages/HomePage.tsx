@@ -111,8 +111,8 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
 
   return (
     <div className="min-h-screen bg-[#F8F6F2] relative overflow-x-hidden">
-      {/* Subtle noise texture overlay for tactile depth */}
-      <div className="fixed inset-0 pointer-events-none opacity-20 bg-[url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noise)"/%3E%3C/svg%3E')] bg-repeat bg-[length:200px]"></div>
+      {/* Subtle noise texture overlay for tactile depth — FIXED data URI with %22 */}
+      <div className="fixed inset-0 pointer-events-none opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox=%220%200%20200%20200%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter%20id=%22noise%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.65%22%20numOctaves=%223%22%20stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23noise)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:200px]"></div>
 
       {/* Hero Section — Asymmetrical, cinematic, with subtle scale animation */}
       <div className="relative h-screen overflow-hidden">
