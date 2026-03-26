@@ -70,9 +70,9 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
 
     if (priceRange !== 'all') {
       filtered = filtered.filter((p) => {
-        if (priceRange === 'under-5000') return p.price < 5000;
-        if (priceRange === '5000-10000') return p.price >= 5000 && p.price <= 10000;
-        if (priceRange === 'over-10000') return p.price > 10000;
+        if (priceRange === 'under-500') return p.price < 500;
+        if (priceRange === '500-1000') return p.price >= 500 && p.price <= 1000;
+        if (priceRange === 'over-1000') return p.price > 1000;
         return true;
       });
     }
@@ -100,7 +100,7 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
 
   const getWhatsAppLink = (product: Product) => {
     const message = `Hi, I'm interested in ${product.name} (Ksh ${product.price.toLocaleString()})`;
-    return `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
+    return `https://wa.me/254798893450?text=${encodeURIComponent(message)}`;
   };
 
   const availableSubcategories = selectedCategory
@@ -232,9 +232,9 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
                   style={{ fontFamily: 'Marcellus, serif' }}
                 >
                   <option value="all">All Prices</option>
-                  <option value="under-5000">Under Ksh 5,000</option>
-                  <option value="5000-10000">Ksh 5,000 - 10,000</option>
-                  <option value="over-10000">Over Ksh 10,000</option>
+                  <option value="under-500">Under Ksh 500</option>
+                  <option value="500-1000">Ksh 500 - 1000</option>
+                  <option value="over-1000">Over Ksh 1000</option>
                 </select>
               </div>
             </div>
