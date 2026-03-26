@@ -8,32 +8,32 @@ interface HomePageProps {
 
 const heroSlides = [
   {
-    image: 'https://images.pexels.com/photos/1454171/pexels-photo-1454171.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/7314460/pexels-photo-7314460.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Bold Pieces for Bold Women',
     subtitle: 'Elevate Your Style',
   },
   {
-    image: 'https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/36339479/pexels-photo-36339479.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Statement Elegance',
     subtitle: 'Make Every Moment Count',
   },
   {
-    image: 'https://images.pexels.com/photos/1446524/pexels-photo-1446524.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/31730435/pexels-photo-31730435.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Luxury Redefined',
     subtitle: 'Discover Your Bold',
   },
   {
-    image: 'https://images.pexels.com/photos/1133154/pexels-photo-1133154.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/36536669/pexels-photo-36536669.png?auto=compress&cs=tinysrgb&w=1920',
     title: 'Timeless Craftsmanship',
     subtitle: 'Every Piece Tells a Story',
   },
   {
-    image: 'https://images.pexels.com/photos/1442483/pexels-photo-1442483.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/5043048/pexels-photo-5043048.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Modern Elegance',
     subtitle: 'Designed for You',
   },
   {
-    image: 'https://images.pexels.com/photos/1430318/pexels-photo-1430318.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/36339461/pexels-photo-36339461.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Uniquely Yours',
     subtitle: 'Celebrate Your Individuality',
   },
@@ -573,8 +573,8 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             </div>
             <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
               <img
-                src="https://images.pexels.com/photos/1462636/pexels-photo-1462636.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="Woman wearing Boldify jewellery"
+                src="https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                alt="Jewellery"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
