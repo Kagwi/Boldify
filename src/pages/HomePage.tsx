@@ -45,6 +45,9 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Refs for scroll‑reveal animation and section navigation
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
@@ -58,10 +61,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     fetchNewArrivals();
     fetchReviews();
 
-    // Reduced interval to 4 seconds for faster scrolling
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 4000);
+      // Trigger text animation on slide change
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 800);
+    }, 3000); // faster autoplay
 
     return () => clearInterval(interval);
   }, []);
@@ -93,6 +98,15 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     return () => observer.disconnect();
   }, []);
 
+  // Parallax effect on mouse move
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePosition({ x, y });
+  };
+
   const fetchFeaturedProducts = async () => {
     const { data } = await supabase
       .from('products')
@@ -121,8 +135,16 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     if (data) setReviews(data);
   };
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 800);
+  };
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 800);
+  };
 
   const getWhatsAppLink = (product: Product) => {
     const message = `Hi, I'm interested in ${product.name} (Ksh ${product.price.toLocaleString()})`;
@@ -157,51 +179,75 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
       {/* Subtle noise texture overlay */}
       <div className="fixed inset-0 pointer-events-none opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox=%220%200%20200%20200%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter%20id=%22noise%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.65%22%20numOctaves=%223%22%20stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23noise)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:200px]"></div>
 
-      {/* Hero Section */}
-      <div className="relative h-screen overflow-hidden">
-        {heroSlides.map((slide, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-all duration-1200 ease-out ${
-              index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
-            }`}
-            style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10" />
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover"
-              style={{ willChange: 'transform' }}
-            />
-            <div className="absolute inset-0 z-20 flex items-center justify-start px-8 md:px-20 lg:px-32">
-              <div className="max-w-2xl text-left">
-                <h1
-                  className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight"
-                  style={{ fontFamily: 'Jolt, serif' }}
-                >
-                  {slide.title}
-                </h1>
-                <p
-                  className="text-xl md:text-3xl text-white/90 mb-12 font-light tracking-wide"
-                  style={{ fontFamily: 'Playfair Display, serif' }}
-                >
-                  {slide.subtitle}
-                </p>
-                <button
-                  onClick={onNavigateToShop}
-                  className="group bg-transparent border-2 border-white text-white px-12 py-4 text-lg font-bold hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 hover:shadow-2xl"
-                  style={{ fontFamily: 'Marcellus, serif' }}
-                >
-                  <span className="relative inline-block">
-                    SHOP NOW
-                    <span className="absolute bottom-0 left-0 w-0 h-px bg-white group-hover:w-full transition-all duration-500"></span>
-                  </span>
-                </button>
+      {/* Hero Section with 3D Parallax */}
+      <div
+        ref={heroRef}
+        className="relative h-screen overflow-hidden cursor-grab active:cursor-grabbing"
+        onMouseMove={handleMouseMove}
+      >
+        {heroSlides.map((slide, index) => {
+          // Calculate parallax offset for active slide only
+          const offsetX = index === currentSlide ? mousePosition.x * 40 : 0;
+          const offsetY = index === currentSlide ? mousePosition.y * 30 : 0;
+          return (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-all duration-1200 ease-out ${
+                index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
+              }`}
+              style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10" />
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover will-change-transform"
+                style={{
+                  transform: `translate(${offsetX}px, ${offsetY}px) scale(1.05)`,
+                  transition: 'transform 0.1s ease-out',
+                }}
+              />
+              <div className="absolute inset-0 z-20 flex items-center justify-start px-8 md:px-20 lg:px-32">
+                <div className="max-w-2xl text-left">
+                  <h1
+                    className={`text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight transition-all duration-700 ${
+                      isAnimating
+                        ? 'opacity-0 -translate-y-6 scale-95 rotate-2'
+                        : 'opacity-100 translate-y-0 scale-100 rotate-0'
+                    }`}
+                    style={{ fontFamily: 'Jolt, serif', transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+                  >
+                    {slide.title}
+                  </h1>
+                  <p
+                    className={`text-xl md:text-3xl text-white/90 mb-12 font-light tracking-wide transition-all duration-700 delay-100 ${
+                      isAnimating
+                        ? 'opacity-0 -translate-y-4 scale-95'
+                        : 'opacity-100 translate-y-0 scale-100'
+                    }`}
+                    style={{ fontFamily: 'Playfair Display, serif' }}
+                  >
+                    {slide.subtitle}
+                  </p>
+                  <button
+                    onClick={onNavigateToShop}
+                    className={`group bg-transparent border-2 border-white text-white px-12 py-4 text-lg font-bold hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 hover:shadow-2xl transition-all duration-700 delay-200 ${
+                      isAnimating
+                        ? 'opacity-0 translate-y-4'
+                        : 'opacity-100 translate-y-0'
+                    }`}
+                    style={{ fontFamily: 'Marcellus, serif' }}
+                  >
+                    <span className="relative inline-block">
+                      SHOP NOW
+                      <span className="absolute bottom-0 left-0 w-0 h-px bg-white group-hover:w-full transition-all duration-500"></span>
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         <button
           onClick={prevSlide}
@@ -220,7 +266,11 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
           {heroSlides.map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentSlide(index)}
+              onClick={() => {
+                setCurrentSlide(index);
+                setIsAnimating(true);
+                setTimeout(() => setIsAnimating(false), 800);
+              }}
               className={`transition-all duration-500 rounded-full ${
                 index === currentSlide
                   ? 'w-8 h-1 bg-white'
