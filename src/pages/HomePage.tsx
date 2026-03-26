@@ -546,7 +546,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
           aboutRef.current = el;
         }}
         className="relative py-12 px-6 md:px-12 lg:px-24 bg-cover bg-center"
-        style={{ backgroundImage: "url('https://images.pexels.com/photos/1689318/pexels-photo-1689318.jpeg?auto=compress&cs=tinysrgb&w=1920')" }}
+        style={{ backgroundImage: "url('https://images.pexels.com/photos/6387626/pexels-photo-6387626.jpeg?auto=compress&cs=tinysrgb&w=1920')" }}
       >
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/70"></div>
