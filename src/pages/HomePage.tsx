@@ -8,32 +8,32 @@ interface HomePageProps {
 
 const heroSlides = [
   {
-    image: 'https://images.pexels.com/photos/7314460/pexels-photo-7314460.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/1454171/pexels-photo-1454171.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Bold Pieces for Bold Women',
     subtitle: 'Elevate Your Style',
   },
   {
-    image: 'https://images.pexels.com/photos/36339479/pexels-photo-36339479.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Statement Elegance',
     subtitle: 'Make Every Moment Count',
   },
   {
-    image: 'https://images.pexels.com/photos/31730435/pexels-photo-31730435.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/1446524/pexels-photo-1446524.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Luxury Redefined',
     subtitle: 'Discover Your Bold',
   },
   {
-    image: 'https://images.pexels.com/photos/36536669/pexels-photo-36536669.png?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/1133154/pexels-photo-1133154.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Timeless Craftsmanship',
     subtitle: 'Every Piece Tells a Story',
   },
   {
-    image: 'https://images.pexels.com/photos/5043048/pexels-photo-5043048.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/1442483/pexels-photo-1442483.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Modern Elegance',
     subtitle: 'Designed for You',
   },
   {
-    image: 'https://images.pexels.com/photos/36339461/pexels-photo-36339461.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/1430318/pexels-photo-1430318.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Uniquely Yours',
     subtitle: 'Celebrate Your Individuality',
   },
@@ -64,8 +64,8 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
       setIsAnimating(true);
-      setTimeout(() => setIsAnimating(false), 800);
-    }, 3000);
+      setTimeout(() => setIsAnimating(false), 900); // slower reset
+    }, 4000); // autoplay interval also slightly longer
 
     return () => clearInterval(interval);
   }, []);
@@ -128,12 +128,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 800);
+    setTimeout(() => setIsAnimating(false), 900);
   };
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
     setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 800);
+    setTimeout(() => setIsAnimating(false), 900);
   };
 
   const getWhatsAppLink = (product: Product) => {
@@ -148,7 +148,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     const body = encodeURIComponent(
       `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
     );
-    window.location.href = `mailto:boldifyjewellery@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:boldifyjewelry@gmail.com?subject=${subject}&body=${body}`;
     setFormData({ name: '', email: '', message: '' });
   };
 
@@ -189,7 +189,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
           return (
             <div
               key={index}
-              className={`absolute inset-0 transition-all duration-1200 ease-out ${
+              className={`absolute inset-0 transition-all duration-1500 ease-out ${
                 index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
               }`}
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
@@ -207,7 +207,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               <div className="absolute inset-0 z-20 flex items-center justify-start px-8 md:px-20 lg:px-32">
                 <div className="max-w-2xl text-left">
                   <h1
-                    className={`text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight transition-all duration-700 ${
+                    className={`text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight transition-all duration-900 ${
                       isAnimating
                         ? 'opacity-0 -translate-y-6 scale-95 rotate-2'
                         : 'opacity-100 translate-y-0 scale-100 rotate-0'
@@ -217,7 +217,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                     {slide.title}
                   </h1>
                   <p
-                    className={`text-xl md:text-3xl text-white/90 mb-12 font-light tracking-wide transition-all duration-700 delay-100 ${
+                    className={`text-xl md:text-3xl text-white/90 mb-12 font-light tracking-wide transition-all duration-900 delay-150 ${
                       isAnimating
                         ? 'opacity-0 -translate-y-4 scale-95'
                         : 'opacity-100 translate-y-0 scale-100'
@@ -228,7 +228,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   </p>
                   <button
                     onClick={onNavigateToShop}
-                    className={`group bg-transparent border-2 border-white text-white px-12 py-4 text-lg font-bold hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 hover:shadow-2xl transition-all duration-700 delay-200 ${
+                    className={`group bg-transparent border-2 border-white text-white px-12 py-4 text-lg font-bold hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 hover:shadow-2xl transition-all duration-900 delay-300 ${
                       isAnimating
                         ? 'opacity-0 translate-y-4'
                         : 'opacity-100 translate-y-0'
@@ -266,7 +266,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               onClick={() => {
                 setCurrentSlide(index);
                 setIsAnimating(true);
-                setTimeout(() => setIsAnimating(false), 800);
+                setTimeout(() => setIsAnimating(false), 900);
               }}
               className={`transition-all duration-500 rounded-full ${
                 index === currentSlide
@@ -286,7 +286,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[0] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4 tracking-tight"
@@ -357,7 +357,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[1] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
@@ -428,7 +428,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[2] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-white mb-4"
@@ -440,7 +440,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               className="text-gray-300 text-lg font-light max-w-2xl mx-auto"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
-              More than jewellery — a celebration of you
+              More than jewelry — a celebration of you
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -455,22 +455,22 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                 icon: Award,
                 title: 'Artisan Crafted',
                 description: 'Each piece is meticulously handcrafted by skilled artisans who pour passion and precision into every detail.',
-                delay: 150,
+                delay: 200,
               },
               {
                 icon: Heart,
                 title: 'Timeless Design',
-                description: 'Modern silhouettes meet classic elegance – jewellery that transcends trends and becomes a cherished heirloom.',
-                delay: 300,
+                description: 'Modern silhouettes meet classic elegance – jewelry that transcends trends and becomes a cherished heirloom.',
+                delay: 400,
               },
             ].map((item, idx) => (
               <div
                 key={idx}
                 ref={(el) => (experienceCardsRef.current[idx] = el)}
-                className="text-center opacity-0 translate-y-6 transition-all duration-700 group"
+                className="text-center opacity-0 translate-y-6 transition-all duration-800 group"
                 style={{ transitionDelay: `${item.delay}ms` }}
               >
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/10 group-hover:bg-white/20 transition-colors duration-300 mb-5">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/10 group-hover:bg-white/20 transition-colors duration-500 mb-5">
                   <item.icon className="h-6 w-6 text-[#C4A747]" />
                 </div>
                 <h3 className="text-xl font-medium text-white mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
@@ -493,7 +493,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[3] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
@@ -549,32 +549,32 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-6xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[4] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-white mb-4"
               style={{ fontFamily: 'Jolt, serif' }}
             >
-              About Boldify Jewellery
+              About Boldify Jewelry
             </h2>
             <div className="w-24 h-px bg-[#C4A747] mx-auto mb-6"></div>
           </div>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-gray-200 space-y-6 text-lg leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
               <p>
-                At Boldify Jewellery.Ke, we believe that every woman deserves to wear pieces that reflect her strength, confidence, and unique style. Our carefully curated collection features bold, statement jewellery designed for the modern Kenyan woman who isn't afraid to stand out.
+                At Boldify Jewelry.Ke, we believe that every woman deserves to wear pieces that reflect her strength, confidence, and unique style. Our carefully curated collection features bold, statement jewelry designed for the modern Kenyan woman who isn't afraid to stand out.
               </p>
               <p>
                 From elegant necklaces to stunning earrings and exquisite bangles, each piece in our collection is selected with meticulous attention to detail. We combine luxury with affordability, ensuring that you can express your bold personality without compromise.
               </p>
               <p>
-                Our mission is simple: to empower women through jewellery that makes them feel unstoppable. Whether you're dressing up for a special occasion or adding a touch of elegance to your everyday look, Boldify has the perfect piece for you.
+                Our mission is simple: to empower women through jewelry that makes them feel unstoppable. Whether you're dressing up for a special occasion or adding a touch of elegance to your everyday look, Boldify has the perfect piece for you.
               </p>
             </div>
             <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
               <img
-                src="https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="Jewellery"
+                src="https://images.pexels.com/photos/1462636/pexels-photo-1462636.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                alt="Woman wearing Boldify jewelry"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
@@ -595,7 +595,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-6xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[5] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
@@ -636,11 +636,11 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                     Email
                   </h3>
                   <a
-                    href="mailto:boldifyjewellery@gmail.com"
+                    href="mailto:boldifyjewelry@gmail.com"
                     className="text-[#666666] hover:text-[#C4A747] transition-colors duration-300"
                     style={{ fontFamily: 'Marcellus, serif' }}
                   >
-                    boldifyjewellery@gmail.com
+                    boldifyjewelry@gmail.com
                   </a>
                 </div>
               </div>
@@ -730,7 +730,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                 BOLDIFY
               </button>
               <p className="text-gray-400 text-sm mt-2" style={{ fontFamily: 'Marcellus, serif' }}>
-                Statement jewellery for the bold woman.
+                Statement jewelry for the bold woman.
               </p>
             </div>
 
@@ -805,7 +805,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
 
           <div className="border-t border-gray-800 pt-6 text-center">
             <p className="text-gray-500 text-sm" style={{ fontFamily: 'Marcellus, serif' }}>
-              © 2026 Boldify Jewellery.Ke. All rights reserved.
+              © 2026 Boldify Jewelry.Ke. All rights reserved.
             </p>
           </div>
         </div>
