@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Star, Phone, Mail, MessageCircle, Send } from 'lucide-react';
 import { supabase, Product, Review } from '../lib/supabase';
 
@@ -31,6 +31,9 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
+  // Refs for scroll‑reveal animation
+  const sectionsRef = useRef<(HTMLElement | null)[]>([]);
+
   useEffect(() => {
     fetchFeaturedProducts();
     fetchNewArrivals();
@@ -41,6 +44,27 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     }, 5000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Intersection Observer for scroll‑triggered reveals
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    sectionsRef.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   const fetchFeaturedProducts = async () => {
@@ -86,123 +110,149 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
+    <div className="min-h-screen bg-[#F8F6F2] relative overflow-x-hidden">
+      {/* Subtle noise texture overlay for tactile depth */}
+      <div className="fixed inset-0 pointer-events-none opacity-20 bg-[url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noise)"/%3E%3C/svg%3E')] bg-repeat bg-[length:200px]"></div>
+
+      {/* Hero Section — Asymmetrical, cinematic, with subtle scale animation */}
       <div className="relative h-screen overflow-hidden">
         {heroSlides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
+            className={`absolute inset-0 transition-all duration-1000 ease-out ${
+              index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
             }`}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-royal-blue/40 to-black/80 z-10" />
+            {/* Gradient overlay replaced with a subtle vignette */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10" />
             <img
               src={slide.image}
               alt={slide.title}
               className="w-full h-full object-cover"
+              style={{ willChange: 'transform' }}
             />
-            <div className="absolute inset-0 z-20 flex items-center justify-center">
-              <div className="text-center px-4">
+            {/* Content positioned asymmetrically — left‑aligned with generous negative space */}
+            <div className="absolute inset-0 z-20 flex items-center justify-start px-8 md:px-20 lg:px-32">
+              <div className="max-w-2xl text-left">
                 <h1
-                  className="text-5xl md:text-7xl lg:text-8xl font-bold text-gold mb-6 animate-fade-in"
+                  className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight"
                   style={{ fontFamily: 'Jolt, serif' }}
                 >
                   {slide.title}
                 </h1>
                 <p
-                  className="text-xl md:text-3xl text-gray-200 mb-12"
+                  className="text-xl md:text-3xl text-white/90 mb-12 font-light tracking-wide"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
                   {slide.subtitle}
                 </p>
                 <button
                   onClick={onNavigateToShop}
-                  className="bg-gold text-black px-12 py-4 text-lg font-bold hover:bg-gold/90 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-gold/50"
+                  className="group bg-transparent border-2 border-white text-white px-12 py-4 text-lg font-bold hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 hover:shadow-2xl"
                   style={{ fontFamily: 'Marcellus, serif' }}
                 >
-                  SHOP NOW
+                  <span className="relative inline-block">
+                    SHOP NOW
+                    <span className="absolute bottom-0 left-0 w-0 h-px bg-white group-hover:w-full transition-all duration-500"></span>
+                  </span>
                 </button>
               </div>
             </div>
           </div>
         ))}
 
+        {/* Navigation buttons — refined, with hover glow */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-gold/90 text-white hover:text-black p-3 transition-all duration-300"
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-30 bg-black/40 backdrop-blur-sm hover:bg-white/90 text-white hover:text-black p-3 transition-all duration-300 rounded-full focus:outline-none"
         >
-          <ChevronLeft className="h-8 w-8" />
+          <ChevronLeft className="h-6 w-6" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-black/50 hover:bg-gold/90 text-white hover:text-black p-3 transition-all duration-300"
+          className="absolute right-6 top-1/2 -translate-y-1/2 z-30 bg-black/40 backdrop-blur-sm hover:bg-white/90 text-white hover:text-black p-3 transition-all duration-300 rounded-full focus:outline-none"
         >
-          <ChevronRight className="h-8 w-8" />
+          <ChevronRight className="h-6 w-6" />
         </button>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex space-x-3">
+        {/* Indicator dots — more elegant */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex space-x-2">
           {heroSlides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 transition-all duration-300 ${
-                index === currentSlide ? 'bg-gold w-12' : 'bg-gray-400'
+              className={`transition-all duration-500 rounded-full ${
+                index === currentSlide
+                  ? 'w-8 h-1 bg-white'
+                  : 'w-2 h-1 bg-white/50 hover:bg-white/80'
               }`}
             />
           ))}
         </div>
       </div>
 
-      <section className="py-20 px-4">
+      {/* Featured Collections — with scroll‑reveal and macro zoom */}
+      <section
+        ref={(el) => (sectionsRef.current[0] = el)}
+        className="py-32 px-6 md:px-12 lg:px-24 opacity-0 translate-y-10 transition-all duration-1000 delay-200"
+      >
         <div className="max-w-7xl mx-auto">
-          <h2
-            className="text-4xl md:text-5xl font-bold text-gold text-center mb-4"
-            style={{ fontFamily: 'Jolt, serif' }}
-          >
-            Featured Collections
-          </h2>
-          <p
-            className="text-gray-400 text-center mb-12 text-lg"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            Handpicked pieces that define boldness
-          </p>
+          {/* Title treatment — asymmetrical, with cinematic negative space */}
+          <div className="mb-20 text-left md:text-center">
+            <h2
+              className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4 tracking-tight"
+              style={{ fontFamily: 'Jolt, serif' }}
+            >
+              Featured Collections
+            </h2>
+            <p
+              className="text-[#4A4A4A] text-lg font-light max-w-2xl mx-auto"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
+              Handpicked pieces that define boldness
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+            {featuredProducts.map((product, idx) => (
               <div
                 key={product.id}
-                className="group cursor-pointer overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold transition-all duration-300"
+                className="group relative cursor-pointer bg-white/80 backdrop-blur-sm border border-[#E5E5E5] hover:border-[#C4A747] transition-all duration-500 hover:shadow-2xl"
+                style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.9, 0.4, 1.1)' }}
               >
-                <div className="relative h-80 overflow-hidden">
+                {/* Macro zoom container */}
+                <div className="relative h-80 overflow-hidden bg-[#FAFAFA]">
                   <img
                     src={product.image_url}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125 will-change-transform"
+                    style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.95, 0.4, 1.05)' }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Subtle gradient overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
                 <div className="p-6">
                   <h3
-                    className="text-xl font-bold text-white mb-2"
+                    className="text-xl font-semibold text-[#1A1A1A] mb-2"
                     style={{ fontFamily: 'Playfair Display, serif' }}
                   >
                     {product.name}
                   </h3>
-                  <p className="text-gray-400 text-sm mb-4" style={{ fontFamily: 'Marcellus, serif' }}>
+                  <p className="text-[#666666] text-sm mb-4 line-clamp-2" style={{ fontFamily: 'Marcellus, serif' }}>
                     {product.description}
                   </p>
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-gold" style={{ fontFamily: 'Jolt, serif' }}>
+                    <span className="text-2xl font-bold text-[#C4A747]" style={{ fontFamily: 'Jolt, serif' }}>
                       Ksh {product.price.toLocaleString()}
                     </span>
                     <a
                       href={getWhatsAppLink(product)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-gold text-black px-4 py-2 text-sm font-bold hover:bg-gold/90 transition-colors duration-300"
+                      className="relative overflow-hidden bg-[#1A1A1A] text-white px-5 py-2 text-sm font-bold transition-all duration-300 hover:bg-[#C4A747] hover:text-black group/btn"
                     >
-                      ORDER
+                      <span className="relative z-10">ORDER</span>
+                      <span className="absolute inset-0 bg-[#C4A747] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></span>
                     </a>
                   </div>
                 </div>
@@ -212,58 +262,65 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      <section className="py-20 px-4 bg-gradient-to-b from-black to-gray-900">
+      {/* New Arrivals — similar treatment, with staggered animation via CSS */}
+      <section
+        ref={(el) => (sectionsRef.current[1] = el)}
+        className="py-32 px-6 md:px-12 lg:px-24 bg-[#F1EFEA] opacity-0 translate-y-10 transition-all duration-1000 delay-300"
+      >
         <div className="max-w-7xl mx-auto">
-          <h2
-            className="text-4xl md:text-5xl font-bold text-gold text-center mb-4"
-            style={{ fontFamily: 'Jolt, serif' }}
-          >
-            New Arrivals
-          </h2>
-          <p
-            className="text-gray-400 text-center mb-12 text-lg"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            Fresh additions to elevate your collection
-          </p>
+          <div className="mb-20 text-left md:text-center">
+            <h2
+              className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4"
+              style={{ fontFamily: 'Jolt, serif' }}
+            >
+              New Arrivals
+            </h2>
+            <p
+              className="text-[#4A4A4A] text-lg font-light max-w-2xl mx-auto"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
+              Fresh additions to elevate your collection
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
             {newArrivals.map((product) => (
               <div
                 key={product.id}
-                className="group cursor-pointer overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold transition-all duration-300"
+                className="group relative cursor-pointer bg-white/80 backdrop-blur-sm border border-[#E5E5E5] hover:border-[#C4A747] transition-all duration-500"
               >
-                <div className="relative h-80 overflow-hidden">
+                <div className="relative h-80 overflow-hidden bg-[#FAFAFA]">
                   <img
                     src={product.image_url}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125 will-change-transform"
                   />
-                  <span className="absolute top-4 left-4 bg-gold text-black px-3 py-1 text-xs font-bold">
+                  <span className="absolute top-4 left-4 bg-[#C4A747] text-black px-3 py-1 text-xs font-bold tracking-wide z-10">
                     NEW
                   </span>
                 </div>
                 <div className="p-6">
                   <h3
-                    className="text-xl font-bold text-white mb-2"
+                    className="text-xl font-semibold text-[#1A1A1A] mb-2"
                     style={{ fontFamily: 'Playfair Display, serif' }}
                   >
                     {product.name}
                   </h3>
-                  <p className="text-gray-400 text-sm mb-4" style={{ fontFamily: 'Marcellus, serif' }}>
+                  <p className="text-[#666666] text-sm mb-4 line-clamp-2" style={{ fontFamily: 'Marcellus, serif' }}>
                     {product.description}
                   </p>
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-gold" style={{ fontFamily: 'Jolt, serif' }}>
+                    <span className="text-2xl font-bold text-[#C4A747]" style={{ fontFamily: 'Jolt, serif' }}>
                       Ksh {product.price.toLocaleString()}
                     </span>
                     <a
                       href={getWhatsAppLink(product)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-gold text-black px-4 py-2 text-sm font-bold hover:bg-gold/90 transition-colors duration-300"
+                      className="relative overflow-hidden bg-[#1A1A1A] text-white px-5 py-2 text-sm font-bold transition-all duration-300 hover:bg-[#C4A747] hover:text-black group/btn"
                     >
-                      ORDER
+                      <span className="relative z-10">ORDER</span>
+                      <span className="absolute inset-0 bg-[#C4A747] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></span>
                     </a>
                   </div>
                 </div>
@@ -273,41 +330,47 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      <section className="py-20 px-4">
+      {/* Customer Reviews — with card hover scaling */}
+      <section
+        ref={(el) => (sectionsRef.current[2] = el)}
+        className="py-32 px-6 md:px-12 lg:px-24 opacity-0 translate-y-10 transition-all duration-1000 delay-400"
+      >
         <div className="max-w-7xl mx-auto">
-          <h2
-            className="text-4xl md:text-5xl font-bold text-gold text-center mb-4"
-            style={{ fontFamily: 'Jolt, serif' }}
-          >
-            Customer Reviews
-          </h2>
-          <p
-            className="text-gray-400 text-center mb-12 text-lg"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            What our bold women say
-          </p>
+          <div className="mb-20 text-left md:text-center">
+            <h2
+              className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4"
+              style={{ fontFamily: 'Jolt, serif' }}
+            >
+              Customer Reviews
+            </h2>
+            <p
+              className="text-[#4A4A4A] text-lg font-light max-w-2xl mx-auto"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
+              What our bold women say
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {reviews.map((review) => (
               <div
                 key={review.id}
-                className="bg-gray-900/50 border border-gray-800 p-6 hover:border-gold transition-all duration-300"
+                className="bg-white border border-[#E5E5E5] p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:border-[#C4A747]"
               >
                 <div className="flex mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
                       className={`h-5 w-5 ${
-                        i < review.rating ? 'text-gold fill-gold' : 'text-gray-600'
+                        i < review.rating ? 'text-[#C4A747] fill-[#C4A747]' : 'text-[#DDD]'
                       }`}
                     />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-4 italic" style={{ fontFamily: 'Marcellus, serif' }}>
+                <p className="text-[#333] mb-6 italic text-base leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
                   "{review.comment}"
                 </p>
-                <p className="text-gold font-bold" style={{ fontFamily: 'Playfair Display, serif' }}>
+                <p className="text-[#C4A747] font-semibold tracking-wide" style={{ fontFamily: 'Playfair Display, serif' }}>
                   {review.customer_name}
                 </p>
               </div>
@@ -316,54 +379,68 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      <section id="about" className="py-20 px-4 bg-gradient-to-b from-gray-900 to-black">
+      {/* About Section — with texture and left‑aligned text */}
+      <section
+        ref={(el) => (sectionsRef.current[3] = el)}
+        className="py-32 px-6 md:px-12 lg:px-24 bg-[#F1EFEA] opacity-0 translate-y-10 transition-all duration-1000 delay-500"
+      >
         <div className="max-w-5xl mx-auto">
-          <h2
-            className="text-4xl md:text-5xl font-bold text-gold text-center mb-8"
-            style={{ fontFamily: 'Jolt, serif' }}
-          >
-            About Boldify Jewellery
-          </h2>
-          <div className="text-gray-300 space-y-6 text-lg" style={{ fontFamily: 'Marcellus, serif' }}>
-            <p className="leading-relaxed">
+          <div className="mb-12 text-left">
+            <h2
+              className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4"
+              style={{ fontFamily: 'Jolt, serif' }}
+            >
+              About Boldify Jewellery
+            </h2>
+            <div className="w-24 h-px bg-[#C4A747] mb-8"></div>
+          </div>
+          <div className="text-[#2C2C2C] space-y-8 text-lg leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
+            <p>
               At Boldify Jewellery.Ke, we believe that every woman deserves to wear pieces that reflect her strength, confidence, and unique style. Our carefully curated collection features bold, statement jewellery designed for the modern Kenyan woman who isn't afraid to stand out.
             </p>
-            <p className="leading-relaxed">
+            <p>
               From elegant necklaces to stunning earrings and exquisite bangles, each piece in our collection is selected with meticulous attention to detail. We combine luxury with affordability, ensuring that you can express your bold personality without compromise.
             </p>
-            <p className="leading-relaxed">
+            <p>
               Our mission is simple: to empower women through jewellery that makes them feel unstoppable. Whether you're dressing up for a special occasion or adding a touch of elegance to your everyday look, Boldify has the perfect piece for you.
             </p>
           </div>
         </div>
       </section>
 
-      <section id="contact" className="py-20 px-4">
-        <div className="max-w-5xl mx-auto">
-          <h2
-            className="text-4xl md:text-5xl font-bold text-gold text-center mb-4"
-            style={{ fontFamily: 'Jolt, serif' }}
-          >
-            Get In Touch
-          </h2>
-          <p
-            className="text-gray-400 text-center mb-12 text-lg"
-            style={{ fontFamily: 'Playfair Display, serif' }}
-          >
-            We'd love to hear from you
-          </p>
+      {/* Contact Section — with refined form and tactile inputs */}
+      <section
+        ref={(el) => (sectionsRef.current[4] = el)}
+        className="py-32 px-6 md:px-12 lg:px-24 opacity-0 translate-y-10 transition-all duration-1000 delay-600"
+      >
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-20 text-left md:text-center">
+            <h2
+              className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4"
+              style={{ fontFamily: 'Jolt, serif' }}
+            >
+              Get In Touch
+            </h2>
+            <p
+              className="text-[#4A4A4A] text-lg font-light max-w-2xl mx-auto"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
+              We'd love to hear from you
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-2 gap-12">
-            <div className="space-y-8">
-              <div className="flex items-start space-x-4">
-                <Phone className="h-6 w-6 text-gold mt-1" />
+          <div className="grid md:grid-cols-2 gap-16">
+            {/* Contact info with refined spacing */}
+            <div className="space-y-10">
+              <div className="flex items-start space-x-5">
+                <Phone className="h-6 w-6 text-[#C4A747] mt-1 flex-shrink-0" />
                 <div>
-                  <h3 className="text-white font-bold mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  <h3 className="text-[#1A1A1A] font-bold mb-2 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
                     Phone
                   </h3>
                   <a
                     href="tel:+254700000000"
-                    className="text-gray-400 hover:text-gold transition-colors"
+                    className="text-[#666666] hover:text-[#C4A747] transition-colors duration-300"
                     style={{ fontFamily: 'Marcellus, serif' }}
                   >
                     +254 700 000 000
@@ -371,15 +448,15 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <Mail className="h-6 w-6 text-gold mt-1" />
+              <div className="flex items-start space-x-5">
+                <Mail className="h-6 w-6 text-[#C4A747] mt-1 flex-shrink-0" />
                 <div>
-                  <h3 className="text-white font-bold mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  <h3 className="text-[#1A1A1A] font-bold mb-2 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
                     Email
                   </h3>
                   <a
                     href="mailto:info@boldifyjewellery.ke"
-                    className="text-gray-400 hover:text-gold transition-colors"
+                    className="text-[#666666] hover:text-[#C4A747] transition-colors duration-300"
                     style={{ fontFamily: 'Marcellus, serif' }}
                   >
                     info@boldifyjewellery.ke
@@ -387,17 +464,17 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <MessageCircle className="h-6 w-6 text-gold mt-1" />
+              <div className="flex items-start space-x-5">
+                <MessageCircle className="h-6 w-6 text-[#C4A747] mt-1 flex-shrink-0" />
                 <div>
-                  <h3 className="text-white font-bold mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  <h3 className="text-[#1A1A1A] font-bold mb-2 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
                     WhatsApp
                   </h3>
                   <a
                     href="https://wa.me/254700000000"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block bg-gold text-black px-6 py-2 font-bold hover:bg-gold/90 transition-colors"
+                    className="inline-block bg-[#1A1A1A] text-white px-6 py-3 font-bold transition-all duration-300 hover:bg-[#C4A747] hover:text-black"
                     style={{ fontFamily: 'Marcellus, serif' }}
                   >
                     CHAT WITH US
@@ -406,6 +483,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               </div>
             </div>
 
+            {/* Contact form with tactile feedback */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <input
@@ -413,7 +491,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   placeholder="Your Name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors"
+                  className="w-full bg-transparent border-b border-[#DDD] text-[#1A1A1A] px-0 py-3 focus:outline-none focus:border-[#C4A747] transition-colors duration-300 placeholder:text-[#AAA]"
                   style={{ fontFamily: 'Marcellus, serif' }}
                   required
                 />
@@ -424,7 +502,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   placeholder="Your Email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors"
+                  className="w-full bg-transparent border-b border-[#DDD] text-[#1A1A1A] px-0 py-3 focus:outline-none focus:border-[#C4A747] transition-colors duration-300 placeholder:text-[#AAA]"
                   style={{ fontFamily: 'Marcellus, serif' }}
                   required
                 />
@@ -434,32 +512,54 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   placeholder="Your Message"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  rows={6}
-                  className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors resize-none"
+                  rows={5}
+                  className="w-full bg-transparent border-b border-[#DDD] text-[#1A1A1A] px-0 py-3 focus:outline-none focus:border-[#C4A747] transition-colors duration-300 resize-none placeholder:text-[#AAA]"
                   style={{ fontFamily: 'Marcellus, serif' }}
                   required
                 />
               </div>
               <button
                 type="submit"
-                className="w-full bg-gold text-black px-6 py-3 font-bold hover:bg-gold/90 transition-colors flex items-center justify-center space-x-2"
+                className="group relative w-full bg-[#1A1A1A] text-white px-6 py-3 font-bold overflow-hidden transition-all duration-300 hover:bg-[#C4A747] hover:text-black"
                 style={{ fontFamily: 'Marcellus, serif' }}
               >
-                <span>SEND MESSAGE</span>
-                <Send className="h-5 w-5" />
+                <span className="relative z-10 flex items-center justify-center space-x-2">
+                  <span>SEND MESSAGE</span>
+                  <Send className="h-5 w-5" />
+                </span>
+                <span className="absolute inset-0 bg-[#C4A747] translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
               </button>
             </form>
           </div>
         </div>
       </section>
 
-      <footer className="bg-black border-t border-gold/20 py-8 px-4">
+      {/* Footer — minimal, with gold accent */}
+      <footer className="border-t border-[#E5E5E5] py-10 px-6 md:px-12 bg-white">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-gray-400" style={{ fontFamily: 'Marcellus, serif' }}>
+          <p className="text-[#666666] text-sm" style={{ fontFamily: 'Marcellus, serif' }}>
             © 2024 Boldify Jewellery.Ke. All rights reserved.
           </p>
         </div>
       </footer>
+
+      <style jsx>{`
+        /* Custom reveal animations */
+        .visible {
+          opacity: 1 !important;
+          transform: translateY(0) !important;
+        }
+
+        /* Smooth scroll behavior */
+        html {
+          scroll-behavior: smooth;
+        }
+
+        /* Custom cursor for interactive elements (optional) */
+        a, button, [role="button"] {
+          cursor: pointer;
+        }
+      `}</style>
     </div>
   );
 }
