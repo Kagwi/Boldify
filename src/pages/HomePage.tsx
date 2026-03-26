@@ -63,10 +63,9 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-      // Trigger text animation on slide change
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 800);
-    }, 3000); // faster autoplay
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
@@ -97,15 +96,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
 
     return () => observer.disconnect();
   }, []);
-
-  // Parallax effect on mouse move
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!heroRef.current) return;
-    const rect = heroRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setMousePosition({ x, y });
-  };
 
   const fetchFeaturedProducts = async () => {
     const { data } = await supabase
@@ -174,19 +164,26 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     }
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePosition({ x, y });
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F6F2] relative overflow-x-hidden">
       {/* Subtle noise texture overlay */}
       <div className="fixed inset-0 pointer-events-none opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox=%220%200%20200%20200%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter%20id=%22noise%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.65%22%20numOctaves=%223%22%20stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23noise)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:200px]"></div>
 
-      {/* Hero Section with 3D Parallax */}
+      {/* Hero Section */}
       <div
         ref={heroRef}
         className="relative h-screen overflow-hidden cursor-grab active:cursor-grabbing"
         onMouseMove={handleMouseMove}
       >
         {heroSlides.map((slide, index) => {
-          // Calculate parallax offset for active slide only
           const offsetX = index === currentSlide ? mousePosition.x * 40 : 0;
           const offsetY = index === currentSlide ? mousePosition.y * 30 : 0;
           return (
@@ -423,10 +420,10 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* The Boldify Experience - Subtle version with animations */}
+      {/* The Boldify Experience - Dark Ocean Blue */}
       <section
         ref={(el) => (sectionsRef.current[2] = el)}
-        className="py-12 px-6 md:px-12 lg:px-24"
+        className="py-12 px-6 md:px-12 lg:px-24 bg-[#0A192F]"
       >
         <div className="max-w-7xl mx-auto">
           <div
@@ -434,13 +431,13 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
-              className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
+              className="text-4xl md:text-5xl font-semibold text-white mb-4"
               style={{ fontFamily: 'Jolt, serif' }}
             >
               The Boldify Experience
             </h2>
             <p
-              className="text-[#4A4A4A] text-lg font-light max-w-2xl mx-auto"
+              className="text-gray-300 text-lg font-light max-w-2xl mx-auto"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               More than jewellery — a celebration of you
@@ -473,13 +470,13 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                 className="text-center opacity-0 translate-y-6 transition-all duration-700 group"
                 style={{ transitionDelay: `${item.delay}ms` }}
               >
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#C4A747]/5 group-hover:bg-[#C4A747]/10 transition-colors duration-300 mb-5">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/10 group-hover:bg-white/20 transition-colors duration-300 mb-5">
                   <item.icon className="h-6 w-6 text-[#C4A747]" />
                 </div>
-                <h3 className="text-xl font-medium text-[#1A1A1A] mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
+                <h3 className="text-xl font-medium text-white mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
                   {item.title}
                 </h3>
-                <p className="text-[#666666] text-sm leading-relaxed max-w-sm mx-auto" style={{ fontFamily: 'Marcellus, serif' }}>
+                <p className="text-gray-300 text-sm leading-relaxed max-w-sm mx-auto" style={{ fontFamily: 'Marcellus, serif' }}>
                   {item.description}
                 </p>
               </div>
@@ -540,14 +537,14 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* About Section */}
+      {/* About Section - Dark Ocean Blue */}
       <section
         id="about"
         ref={(el) => {
           sectionsRef.current[4] = el;
           aboutRef.current = el;
         }}
-        className="py-12 px-6 md:px-12 lg:px-24 bg-[#F1EFEA]"
+        className="py-12 px-6 md:px-12 lg:px-24 bg-[#0A192F]"
       >
         <div className="max-w-6xl mx-auto">
           <div
@@ -555,7 +552,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
-              className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
+              className="text-4xl md:text-5xl font-semibold text-white mb-4"
               style={{ fontFamily: 'Jolt, serif' }}
             >
               About Boldify Jewellery
@@ -563,7 +560,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             <div className="w-24 h-px bg-[#C4A747] mx-auto mb-6"></div>
           </div>
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="text-[#2C2C2C] space-y-6 text-lg leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
+            <div className="text-gray-200 space-y-6 text-lg leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
               <p>
                 At Boldify Jewellery.Ke, we believe that every woman deserves to wear pieces that reflect her strength, confidence, and unique style. Our carefully curated collection features bold, statement jewellery designed for the modern Kenyan woman who isn't afraid to stand out.
               </p>
@@ -580,7 +577,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                 alt="Woman wearing Boldify jewellery"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
             </div>
           </div>
         </div>
