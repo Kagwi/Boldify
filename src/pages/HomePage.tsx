@@ -49,6 +49,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   // Refs for scroll‑reveal animation and section navigation
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
   const headingRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const experienceCardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const aboutRef = useRef<HTMLElement | null>(null);
   const contactRef = useRef<HTMLElement | null>(null);
 
@@ -57,9 +58,10 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     fetchNewArrivals();
     fetchReviews();
 
+    // Reduced interval to 4 seconds for faster scrolling
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, []);
@@ -82,6 +84,9 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
       if (el) observer.observe(el);
     });
     headingRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+    experienceCardsRef.current.forEach((el) => {
       if (el) observer.observe(el);
     });
 
@@ -139,7 +144,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Helper to handle anchor clicks with smooth scroll
   const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault();
     const element = document.getElementById(targetId);
@@ -158,9 +162,10 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         {heroSlides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-all duration-1000 ease-out ${
-              index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+            className={`absolute inset-0 transition-all duration-1200 ease-out ${
+              index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
             }`}
+            style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10" />
             <img
@@ -229,12 +234,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
       {/* Featured Collections */}
       <section
         ref={(el) => (sectionsRef.current[0] = el)}
-        className="py-20 px-6 md:px-12 lg:px-24"
+        className="py-12 px-6 md:px-12 lg:px-24"
       >
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[0] = el)}
-            className="mb-16 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4 tracking-tight"
@@ -297,22 +302,15 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
-        <div className="border-t border-[#C4A747]/20 relative">
-          <div className="absolute left-1/2 -top-2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C4A747]"></div>
-        </div>
-      </div>
-
       {/* New Arrivals */}
       <section
         ref={(el) => (sectionsRef.current[1] = el)}
-        className="py-20 px-6 md:px-12 lg:px-24 bg-[#F1EFEA]"
+        className="py-12 px-6 md:px-12 lg:px-24 bg-[#F1EFEA]"
       >
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[1] = el)}
-            className="mb-16 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
@@ -375,23 +373,15 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
-        <div className="border-t border-[#C4A747]/20 relative">
-          <div className="absolute left-1/2 -top-2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C4A747]"></div>
-        </div>
-      </div>
-
-      {/* The Boldify Experience */}
+      {/* The Boldify Experience - Subtle version with animations */}
       <section
         ref={(el) => (sectionsRef.current[2] = el)}
-        className="py-20 px-6 md:px-12 lg:px-24 relative overflow-hidden"
+        className="py-12 px-6 md:px-12 lg:px-24"
       >
-        <div className="absolute inset-0 opacity-5 bg-[url('https://images.pexels.com/photos/1442483/pexels-photo-1442483.jpeg?auto=compress&cs=tinysrgb&w=800')] bg-cover bg-center mix-blend-multiply"></div>
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[2] = el)}
-            className="mb-16 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
@@ -406,60 +396,57 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               More than jewellery — a celebration of you
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="text-center group">
-              <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center rounded-full bg-[#C4A747]/10 group-hover:bg-[#C4A747]/20 transition-colors duration-500">
-                <Gem className="h-10 w-10 text-[#C4A747]" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {[
+              {
+                icon: Gem,
+                title: 'Ethically Sourced',
+                description: 'We partner with suppliers who prioritize fair labor and sustainable practices, ensuring every gem and metal tells a story of integrity.',
+                delay: 0,
+              },
+              {
+                icon: Award,
+                title: 'Artisan Crafted',
+                description: 'Each piece is meticulously handcrafted by skilled artisans who pour passion and precision into every detail.',
+                delay: 150,
+              },
+              {
+                icon: Heart,
+                title: 'Timeless Design',
+                description: 'Modern silhouettes meet classic elegance – jewellery that transcends trends and becomes a cherished heirloom.',
+                delay: 300,
+              },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                ref={(el) => (experienceCardsRef.current[idx] = el)}
+                className="text-center opacity-0 translate-y-6 transition-all duration-700 group"
+                style={{ transitionDelay: `${item.delay}ms` }}
+              >
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#C4A747]/5 group-hover:bg-[#C4A747]/10 transition-colors duration-300 mb-5">
+                  <item.icon className="h-6 w-6 text-[#C4A747]" />
+                </div>
+                <h3 className="text-xl font-medium text-[#1A1A1A] mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  {item.title}
+                </h3>
+                <p className="text-[#666666] text-sm leading-relaxed max-w-sm mx-auto" style={{ fontFamily: 'Marcellus, serif' }}>
+                  {item.description}
+                </p>
               </div>
-              <h3 className="text-2xl font-bold text-[#1A1A1A] mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Ethically Sourced
-              </h3>
-              <p className="text-[#666666] leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
-                We partner with suppliers who prioritize fair labor and sustainable practices, ensuring every gem and metal tells a story of integrity.
-              </p>
-            </div>
-            <div className="text-center group">
-              <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center rounded-full bg-[#C4A747]/10 group-hover:bg-[#C4A747]/20 transition-colors duration-500">
-                <Award className="h-10 w-10 text-[#C4A747]" />
-              </div>
-              <h3 className="text-2xl font-bold text-[#1A1A1A] mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Artisan Crafted
-              </h3>
-              <p className="text-[#666666] leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
-                Each piece is meticulously handcrafted by skilled artisans who pour passion and precision into every detail.
-              </p>
-            </div>
-            <div className="text-center group">
-              <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center rounded-full bg-[#C4A747]/10 group-hover:bg-[#C4A747]/20 transition-colors duration-500">
-                <Heart className="h-10 w-10 text-[#C4A747]" />
-              </div>
-              <h3 className="text-2xl font-bold text-[#1A1A1A] mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Timeless Design
-              </h3>
-              <p className="text-[#666666] leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
-                Modern silhouettes meet classic elegance – jewellery that transcends trends and becomes a cherished heirloom.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
-        <div className="border-t border-[#C4A747]/20 relative">
-          <div className="absolute left-1/2 -top-2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C4A747]"></div>
-        </div>
-      </div>
-
       {/* Customer Reviews */}
       <section
         ref={(el) => (sectionsRef.current[3] = el)}
-        className="py-20 px-6 md:px-12 lg:px-24"
+        className="py-12 px-6 md:px-12 lg:px-24"
       >
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[3] = el)}
-            className="mb-16 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
@@ -503,26 +490,19 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
-        <div className="border-t border-[#C4A747]/20 relative">
-          <div className="absolute left-1/2 -top-2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C4A747]"></div>
-        </div>
-      </div>
-
-      {/* About Section - with ID */}
+      {/* About Section */}
       <section
         id="about"
         ref={(el) => {
           sectionsRef.current[4] = el;
           aboutRef.current = el;
         }}
-        className="py-20 px-6 md:px-12 lg:px-24 bg-[#F1EFEA]"
+        className="py-12 px-6 md:px-12 lg:px-24 bg-[#F1EFEA]"
       >
         <div className="max-w-6xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[4] = el)}
-            className="mb-16 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
@@ -530,7 +510,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             >
               About Boldify Jewellery
             </h2>
-            <div className="w-24 h-px bg-[#C4A747] mx-auto mb-8"></div>
+            <div className="w-24 h-px bg-[#C4A747] mx-auto mb-6"></div>
           </div>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-[#2C2C2C] space-y-6 text-lg leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
@@ -556,26 +536,19 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
-        <div className="border-t border-[#C4A747]/20 relative">
-          <div className="absolute left-1/2 -top-2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C4A747]"></div>
-        </div>
-      </div>
-
-      {/* Contact Section - with ID */}
+      {/* Contact Section */}
       <section
         id="contact"
         ref={(el) => {
           sectionsRef.current[5] = el;
           contactRef.current = el;
         }}
-        className="py-20 px-6 md:px-12 lg:px-24"
+        className="py-12 px-6 md:px-12 lg:px-24"
       >
         <div className="max-w-6xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[5] = el)}
-            className="mb-16 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
@@ -695,13 +668,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
       </section>
 
       {/* Washout gradient effect above footer */}
-      <div className="relative h-32 bg-gradient-to-t from-[#F1EFEA] to-transparent pointer-events-none"></div>
+      <div className="relative h-24 bg-gradient-to-t from-[#F1EFEA] to-transparent pointer-events-none"></div>
 
       {/* Footer */}
       <footer className="bg-[#1A1A1A] text-white border-t border-[#C4A747]/20 py-12 px-6 md:px-12">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            {/* Logo & Tagline */}
             <div className="text-center md:text-left">
               <button
                 onClick={scrollToTop}
@@ -715,7 +687,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               </p>
             </div>
 
-            {/* Quick Links */}
             <div className="text-center">
               <h3 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
                 Quick Links
@@ -752,7 +723,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               </ul>
             </div>
 
-            {/* Social Links */}
             <div className="text-center md:text-right">
               <h3 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
                 Follow Us
@@ -786,7 +756,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             </div>
           </div>
 
-          {/* Copyright */}
           <div className="border-t border-gray-800 pt-6 text-center">
             <p className="text-gray-500 text-sm" style={{ fontFamily: 'Marcellus, serif' }}>
               © 2026 Boldify Jewellery.Ke. All rights reserved.
