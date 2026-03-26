@@ -8,32 +8,32 @@ interface HomePageProps {
 
 const heroSlides = [
   {
-    image: 'https://images.pexels.com/photos/1454171/pexels-photo-1454171.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/7314460/pexels-photo-7314460.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Bold Pieces for Bold Women',
     subtitle: 'Elevate Your Style',
   },
   {
-    image: 'https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/36339479/pexels-photo-36339479.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Statement Elegance',
     subtitle: 'Make Every Moment Count',
   },
   {
-    image: 'https://images.pexels.com/photos/1446524/pexels-photo-1446524.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/31730435/pexels-photo-31730435.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Luxury Redefined',
     subtitle: 'Discover Your Bold',
   },
   {
-    image: 'https://images.pexels.com/photos/1133154/pexels-photo-1133154.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/36536669/pexels-photo-36536669.png?auto=compress&cs=tinysrgb&w=1920',
     title: 'Timeless Craftsmanship',
     subtitle: 'Every Piece Tells a Story',
   },
   {
-    image: 'https://images.pexels.com/photos/1442483/pexels-photo-1442483.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/5043048/pexels-photo-5043048.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Modern Elegance',
     subtitle: 'Designed for You',
   },
   {
-    image: 'https://images.pexels.com/photos/1430318/pexels-photo-1430318.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://images.pexels.com/photos/36339461/pexels-photo-36339461.jpeg?auto=compress&cs=tinysrgb&w=1920',
     title: 'Uniquely Yours',
     subtitle: 'Celebrate Your Individuality',
   },
@@ -61,11 +61,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     fetchNewArrivals();
     fetchReviews();
 
+    // Slower autoplay (4 seconds)
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
       setIsAnimating(true);
-      setTimeout(() => setIsAnimating(false), 900); // slower reset
-    }, 4000); // autoplay interval also slightly longer
+      setTimeout(() => setIsAnimating(false), 1000); // match slower text animation duration
+    }, 4000);
 
     return () => clearInterval(interval);
   }, []);
@@ -128,12 +129,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 900);
+    setTimeout(() => setIsAnimating(false), 1000);
   };
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
     setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 900);
+    setTimeout(() => setIsAnimating(false), 1000);
   };
 
   const getWhatsAppLink = (product: Product) => {
@@ -148,6 +149,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     const body = encodeURIComponent(
       `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
     );
+    // Updated email address
     window.location.href = `mailto:boldifyjewelry@gmail.com?subject=${subject}&body=${body}`;
     setFormData({ name: '', email: '', message: '' });
   };
@@ -266,7 +268,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               onClick={() => {
                 setCurrentSlide(index);
                 setIsAnimating(true);
-                setTimeout(() => setIsAnimating(false), 900);
+                setTimeout(() => setIsAnimating(false), 1000);
               }}
               className={`transition-all duration-500 rounded-full ${
                 index === currentSlide
@@ -286,7 +288,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[0] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4 tracking-tight"
@@ -357,7 +359,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[1] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
@@ -428,7 +430,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[2] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-white mb-4"
@@ -455,22 +457,22 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                 icon: Award,
                 title: 'Artisan Crafted',
                 description: 'Each piece is meticulously handcrafted by skilled artisans who pour passion and precision into every detail.',
-                delay: 200,
+                delay: 150,
               },
               {
                 icon: Heart,
                 title: 'Timeless Design',
                 description: 'Modern silhouettes meet classic elegance – jewelry that transcends trends and becomes a cherished heirloom.',
-                delay: 400,
+                delay: 300,
               },
             ].map((item, idx) => (
               <div
                 key={idx}
                 ref={(el) => (experienceCardsRef.current[idx] = el)}
-                className="text-center opacity-0 translate-y-6 transition-all duration-800 group"
+                className="text-center opacity-0 translate-y-6 transition-all duration-700 group"
                 style={{ transitionDelay: `${item.delay}ms` }}
               >
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/10 group-hover:bg-white/20 transition-colors duration-500 mb-5">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/10 group-hover:bg-white/20 transition-colors duration-300 mb-5">
                   <item.icon className="h-6 w-6 text-[#C4A747]" />
                 </div>
                 <h3 className="text-xl font-medium text-white mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
@@ -493,7 +495,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-7xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[3] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
@@ -549,7 +551,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-6xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[4] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-white mb-4"
@@ -573,8 +575,8 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             </div>
             <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
               <img
-                src="https://images.pexels.com/photos/1462636/pexels-photo-1462636.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="Woman wearing Boldify jewelry"
+                src="https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                alt="Jewelry"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
@@ -595,7 +597,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="max-w-6xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[5] = el)}
-            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-800"
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
               className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
