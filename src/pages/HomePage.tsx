@@ -65,7 +65,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
       setIsAnimating(true);
-      setTimeout(() => setIsAnimating(false), 1000); // match slower text animation duration
+      setTimeout(() => setIsAnimating(false), 1000);
     }, 4000);
 
     return () => clearInterval(interval);
@@ -149,7 +149,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     const body = encodeURIComponent(
       `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
     );
-    // Updated email address
     window.location.href = `mailto:boldifyjewelry@gmail.com?subject=${subject}&body=${body}`;
     setFormData({ name: '', email: '', message: '' });
   };
@@ -539,16 +538,19 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* About Section - Dark Ocean Blue */}
+      {/* About Section - with background image and overlay */}
       <section
         id="about"
         ref={(el) => {
           sectionsRef.current[4] = el;
           aboutRef.current = el;
         }}
-        className="py-12 px-6 md:px-12 lg:px-24 bg-[#0A192F]"
+        className="relative py-12 px-6 md:px-12 lg:px-24 bg-cover bg-center"
+        style={{ backgroundImage: "url('https://images.pexels.com/photos/1689318/pexels-photo-1689318.jpeg?auto=compress&cs=tinysrgb&w=1920')" }}
       >
-        <div className="max-w-6xl mx-auto">
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/70"></div>
+        <div className="relative z-10 max-w-6xl mx-auto">
           <div
             ref={(el) => (headingRefs.current[4] = el)}
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
