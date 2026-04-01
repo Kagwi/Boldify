@@ -7,8 +7,14 @@ function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'shop'>('home');
   const [showSearch, setShowSearch] = useState(false);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const handleNavigate = (page: 'home' | 'shop') => {
+  const handleNavigate = (page: 'home' | 'shop', categorySlug?: string) => {
+    if (page === 'shop' && categorySlug) {
+      setSelectedCategory(categorySlug);
+    } else {
+      setSelectedCategory(null); // clear category when navigating to home or shop without category
+    }
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -22,9 +28,9 @@ function App() {
         wishlistCount={wishlistCount}
       />
       {currentPage === 'home' ? (
-        <HomePage onNavigateToShop={() => handleNavigate('shop')} />
+        <HomePage onNavigateToShop={(categorySlug) => handleNavigate('shop', categorySlug)} />
       ) : (
-        <ShopPage onWishlistChange={setWishlistCount} />
+        <ShopPage onWishlistChange={setWishlistCount} initialCategory={selectedCategory} />
       )}
     </div>
   );
