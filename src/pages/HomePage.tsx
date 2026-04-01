@@ -8,7 +8,7 @@ interface HomePageProps {
 
 const heroSlides = [
   {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45.jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45.jpeg?raw=true?auto=compress&cs=tinysrgb&w=800',
     title: 'Bold Pieces for Bold Women',
     subtitle: 'Elevate Your Style',
   },
