@@ -6,7 +6,6 @@ interface HomePageProps {
   onNavigateToShop: () => void;
 }
 
-// ✅ Updated heroSlides: removed width/compression parameters, using raw=true only
 const heroSlides = [
   {
     image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45.jpeg?raw=true',
@@ -50,7 +49,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const heroRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Refs for scroll‑reveal animation and section navigation
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
   const headingRefs = useRef<(HTMLDivElement | null)[]>([]);
   const experienceCardsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -62,7 +60,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     fetchNewArrivals();
     fetchReviews();
 
-    // Slower autoplay (4 seconds)
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
       setIsAnimating(true);
@@ -72,7 +69,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     return () => clearInterval(interval);
   }, []);
 
-  // Intersection Observer for scroll‑triggered reveals
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -176,7 +172,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
 
   return (
     <div className="min-h-screen bg-[#F8F6F2] relative overflow-x-hidden">
-      {/* Subtle noise texture overlay */}
       <div className="fixed inset-0 pointer-events-none opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox=%220%200%20200%20200%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter%20id=%22noise%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.65%22%20numOctaves=%223%22%20stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23noise)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:200px]"></div>
 
       {/* Hero Section */}
@@ -197,11 +192,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10" />
-              {/* ✅ Fixed image: no scale, only translation */}
+              {/* ✅ Image now uses object-contain + dark background to avoid cropping */}
+              <div className="absolute inset-0 bg-black/60" />
               <img
                 src={slide.image}
                 alt={slide.title}
-                className="w-full h-full object-cover will-change-transform"
+                className="w-full h-full object-contain will-change-transform"
                 style={{
                   transform: `translate(${offsetX}px, ${offsetY}px)`,
                   transition: 'transform 0.1s ease-out',
@@ -423,7 +419,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* The Boldify Experience - Dark Ocean Blue */}
+      {/* The Boldify Experience */}
       <section
         ref={(el) => (sectionsRef.current[2] = el)}
         className="py-12 px-6 md:px-12 lg:px-24 bg-[#0A192F]"
@@ -540,7 +536,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* About Section - with background image and overlay */}
+      {/* About Section */}
       <section
         id="about"
         ref={(el) => {
@@ -550,7 +546,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         className="relative py-12 px-6 md:px-12 lg:px-24 bg-cover bg-center"
         style={{ backgroundImage: "url('https://images.pexels.com/photos/6387626/pexels-photo-6387626.jpeg?auto=compress&cs=tinysrgb&w=1920')" }}
       >
-        {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/70"></div>
         <div className="relative z-10 max-w-6xl mx-auto">
           <div
@@ -720,10 +715,8 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* Washout gradient effect above footer */}
       <div className="relative h-24 bg-gradient-to-t from-[#F1EFEA] to-transparent pointer-events-none"></div>
 
-      {/* Footer */}
       <footer className="bg-[#1A1A1A] text-white border-t border-[#C4A747]/20 py-12 px-6 md:px-12">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
