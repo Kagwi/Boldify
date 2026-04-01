@@ -4,9 +4,10 @@ import { supabase, Product, Category, Subcategory } from '../lib/supabase';
 
 interface ShopPageProps {
   onWishlistChange: (count: number) => void;
+  initialCategory?: string | null; // new prop
 }
 
-export default function ShopPage({ onWishlistChange }: ShopPageProps) {
+export default function ShopPage({ onWishlistChange, initialCategory }: ShopPageProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -18,12 +19,25 @@ export default function ShopPage({ onWishlistChange }: ShopPageProps) {
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState<string>('all');
 
+  // Fetch products, categories, subcategories
   useEffect(() => {
     fetchProducts();
     fetchCategories();
     fetchSubcategories();
   }, []);
 
+  // Once categories are loaded, apply initialCategory if provided
+  useEffect(() => {
+    if (categories.length > 0 && initialCategory && !selectedCategory) {
+      // Check if the category exists
+      const categoryExists = categories.some(c => c.slug === initialCategory);
+      if (categoryExists) {
+        setSelectedCategory(initialCategory);
+      }
+    }
+  }, [categories, initialCategory]);
+
+  // Re‑filter whenever relevant state changes
   useEffect(() => {
     filterProducts();
   }, [products, selectedCategory, selectedSubcategory, searchQuery, priceRange]);
