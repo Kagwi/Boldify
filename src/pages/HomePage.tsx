@@ -628,7 +628,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* FAQ Section */}
+      {/* FAQ Section - Enhanced with animated smoke & gold/white/black gradient washout */}
       <section
         ref={(el) => (sectionsRef.current[5] = el)}
         className="relative py-12 px-6 md:px-12 lg:px-24 overflow-hidden"
@@ -638,10 +638,17 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
           className="absolute inset-0 bg-cover bg-center opacity-10"
           style={{ backgroundImage: "url('https://images.pexels.com/photos/6387626/pexels-photo-6387626.jpeg?auto=compress&cs=tinysrgb&w=1920')" }}
         ></div>
-        {/* Dark shiny royal blue overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0A192F]/95 via-[#1E2A47]/90 to-[#0A192F]/95 backdrop-blur-[1px]"></div>
-        {/* Optional: add a subtle shiny radial highlight */}
-        <div className="absolute inset-0 bg-radial-gradient from-[#C4A747]/20 via-transparent to-transparent opacity-30"></div>
+
+        {/* Main gradient overlay: gold → white → black, with fade to bottom */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#C4A747]/40 via-white/30 to-black/60"></div>
+
+        {/* Animated smoke layer */}
+        <div className="absolute inset-0 opacity-30 pointer-events-none animate-smoke">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20200%20200%22%3E%3Cfilter%20id=%22smoke%22%3E%3CfeTurbulence%20baseFrequency=%220.01%22%20numOctaves=%223%22%20seed=%221%22/%3E%3CfeColorMatrix%20values=%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.3%200%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23smoke)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:400px] mix-blend-overlay animate-smokeMove"></div>
+        </div>
+
+        {/* Additional subtle radial shine */}
+        <div className="absolute inset-0 bg-radial-gradient from-[#C4A747]/20 via-transparent to-transparent opacity-40"></div>
 
         <div className="relative z-10 max-w-4xl mx-auto">
           <div
@@ -649,13 +656,13 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
-              className="text-4xl md:text-5xl font-semibold text-white mb-4"
+              className="text-4xl md:text-5xl font-semibold text-white drop-shadow-lg"
               style={{ fontFamily: 'Jolt, serif' }}
             >
               Frequently Asked Questions
             </h2>
             <p
-              className="text-gray-300 text-lg font-light max-w-2xl mx-auto"
+              className="text-gray-200 text-lg font-light max-w-2xl mx-auto drop-shadow"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               Everything you need to know about Boldify Jewelry
@@ -667,11 +674,11 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             {faqItems.map((item, index) => (
               <div
                 key={index}
-                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg overflow-hidden transition-all duration-300 hover:border-[#C4A747]/50"
+                className="bg-black/40 backdrop-blur-md border border-white/20 rounded-lg overflow-hidden transition-all duration-300 hover:border-[#C4A747]/70 shadow-lg"
               >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none"
+                  className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none group"
                 >
                   <span className="text-white font-semibold text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
                     {item.question}
@@ -687,7 +694,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                     openFaqIndex === index ? 'max-h-96' : 'max-h-0'
                   }`}
                 >
-                  <div className="px-6 pb-6 pt-2 text-gray-200 leading-relaxed border-t border-white/10">
+                  <div className="px-6 pb-6 pt-2 text-gray-100 leading-relaxed border-t border-white/10">
                     {item.answer}
                   </div>
                 </div>
@@ -935,7 +942,29 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
           cursor: pointer;
         }
         .bg-radial-gradient {
-          background: radial-gradient(circle at 50% 50%, rgba(196, 167, 71, 0.2) 0%, transparent 70%);
+          background: radial-gradient(circle at 50% 50%, rgba(196, 167, 71, 0.3) 0%, transparent 70%);
+        }
+        @keyframes smokeMove {
+          0% {
+            background-position: 0% 0%;
+          }
+          100% {
+            background-position: 200% 200%;
+          }
+        }
+        .animate-smokeMove {
+          animation: smokeMove 20s linear infinite;
+        }
+        .animate-smoke {
+          animation: smokeFade 8s ease-in-out infinite alternate;
+        }
+        @keyframes smokeFade {
+          0% {
+            opacity: 0.2;
+          }
+          100% {
+            opacity: 0.5;
+          }
         }
       `}</style>
     </div>
