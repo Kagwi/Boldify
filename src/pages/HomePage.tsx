@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Star, Phone, Mail, MessageCircle, Send, Gem, Award, Heart, Facebook, Instagram, Twitter, ChevronDown } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';  // assuming React Router is used
 import { supabase, Product, Review, Category } from '../lib/supabase';
 
 interface HomePageProps {
-  onNavigateToShop: () => void;
+  onNavigateToShop: (categorySlug?: string) => void;  // updated to accept optional category slug
 }
 
 const heroSlides = [
@@ -41,7 +40,6 @@ const heroSlides = [
 ];
 
 export default function HomePage({ onNavigateToShop }: HomePageProps) {
-  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
@@ -103,17 +101,15 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     return () => observer.disconnect();
   }, []);
 
-  // Fetch categories
+  // Fetch categories and their representative images
   const fetchCategories = async () => {
     const { data } = await supabase.from('categories').select('*');
     if (data) {
       setCategories(data);
-      // For each category, fetch a product image
       await fetchCategoryImages(data);
     }
   };
 
-  // Fetch one product image per category to use as representative
   const fetchCategoryImages = async (categories: Category[]) => {
     const images: Record<string, string> = {};
     for (const category of categories) {
@@ -208,7 +204,8 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   };
 
   const navigateToCategory = (categorySlug: string) => {
-    navigate(`/shop?category=${categorySlug}`);
+    // Call the parent's navigation function with the category slug
+    onNavigateToShop(categorySlug);
   };
 
   const faqItems = [
@@ -308,7 +305,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                     {slide.subtitle}
                   </p>
                   <button
-                    onClick={onNavigateToShop}
+                    onClick={() => onNavigateToShop()}
                     className={`group bg-transparent border-2 border-white text-white px-12 py-4 text-lg font-bold hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 hover:shadow-2xl transition-all duration-900 delay-300 ${
                       isAnimating
                         ? 'opacity-0 translate-y-4'
@@ -957,7 +954,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   </button>
                 </li>
                 <li>
-                  <button onClick={onNavigateToShop} className="text-gray-400 hover:text-[#C4A747] transition-colors">
+                  <button onClick={() => onNavigateToShop()} className="text-gray-400 hover:text-[#C4A747] transition-colors">
                     Shop
                   </button>
                 </li>
