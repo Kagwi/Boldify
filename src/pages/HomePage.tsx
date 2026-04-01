@@ -191,18 +191,20 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               }`}
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
+              {/* Gradient overlay for text readability */}
               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10" />
-              {/* ✅ Image now uses object-contain + dark background to avoid cropping */}
-              <div className="absolute inset-0 bg-black/60" />
+              
+              {/* Image: full coverage with object-cover, no extra scale */}
               <img
                 src={slide.image}
                 alt={slide.title}
-                className="w-full h-full object-contain will-change-transform"
+                className="w-full h-full object-cover object-center will-change-transform"
                 style={{
                   transform: `translate(${offsetX}px, ${offsetY}px)`,
                   transition: 'transform 0.1s ease-out',
                 }}
               />
+
               <div className="absolute inset-0 z-20 flex items-center justify-start px-8 md:px-20 lg:px-32">
                 <div className="max-w-2xl text-left">
                   <h1
@@ -277,6 +279,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </div>
 
+      {/* Rest of the component remains unchanged from previous version */}
       {/* Featured Collections */}
       <section
         ref={(el) => (sectionsRef.current[0] = el)}
