@@ -8,32 +8,32 @@ interface HomePageProps {
 
 const heroSlides = [
   {
-    image: 'https://images.pexels.com/photos/7314460/pexels-photo-7314460.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45.jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
     title: 'Bold Pieces for Bold Women',
     subtitle: 'Elevate Your Style',
   },
   {
-    image: 'https://images.pexels.com/photos/36339479/pexels-photo-36339479.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44.jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
     title: 'Statement Elegance',
     subtitle: 'Make Every Moment Count',
   },
   {
-    image: 'https://images.pexels.com/photos/31730435/pexels-photo-31730435.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45%20(1).jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
     title: 'Luxury Redefined',
     subtitle: 'Discover Your Bold',
   },
   {
-    image: 'https://images.pexels.com/photos/36536669/pexels-photo-36536669.png?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44%20(2).jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
     title: 'Timeless Craftsmanship',
     subtitle: 'Every Piece Tells a Story',
   },
   {
-    image: 'https://images.pexels.com/photos/5043048/pexels-photo-5043048.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44%20(1).jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
     title: 'Modern Elegance',
     subtitle: 'Designed for You',
   },
   {
-    image: 'https://images.pexels.com/photos/36339461/pexels-photo-36339461.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-28%20at%2000.05.21.jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
     title: 'Uniquely Yours',
     subtitle: 'Celebrate Your Individuality',
   },
