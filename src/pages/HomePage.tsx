@@ -6,34 +6,35 @@ interface HomePageProps {
   onNavigateToShop: () => void;
 }
 
+// ✅ Updated heroSlides: removed width/compression parameters, using raw=true only
 const heroSlides = [
   {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45.jpeg?raw=true?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45.jpeg?raw=true',
     title: 'Bold Pieces for Bold Women',
     subtitle: 'Elevate Your Style',
   },
   {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44.jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44.jpeg?raw=true',
     title: 'Statement Elegance',
     subtitle: 'Make Every Moment Count',
   },
   {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45%20(1).jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45%20(1).jpeg?raw=true',
     title: 'Luxury Redefined',
     subtitle: 'Discover Your Bold',
   },
   {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44%20(2).jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44%20(2).jpeg?raw=true',
     title: 'Timeless Craftsmanship',
     subtitle: 'Every Piece Tells a Story',
   },
   {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44%20(1).jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44%20(1).jpeg?raw=true',
     title: 'Modern Elegance',
     subtitle: 'Designed for You',
   },
   {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-28%20at%2000.05.21.jpeg?raw=true?auto=compress&cs=tinysrgb&w=1920',
+    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-28%20at%2000.05.21.jpeg?raw=true',
     title: 'Uniquely Yours',
     subtitle: 'Celebrate Your Individuality',
   },
@@ -196,12 +197,13 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10" />
+              {/* ✅ Fixed image: no scale, only translation */}
               <img
                 src={slide.image}
                 alt={slide.title}
                 className="w-full h-full object-cover will-change-transform"
                 style={{
-                  transform: `translate(${offsetX}px, ${offsetY}px) scale(1.05)`,
+                  transform: `translate(${offsetX}px, ${offsetY}px)`,
                   transition: 'transform 0.1s ease-out',
                 }}
               />
