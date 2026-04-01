@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Star, Phone, Mail, MessageCircle, Send, Gem, Award, Heart, Facebook, Instagram, Twitter } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, Phone, Mail, MessageCircle, Send, Gem, Award, Heart, Facebook, Instagram, Twitter, ChevronDown } from 'lucide-react';
 import { supabase, Product, Review } from '../lib/supabase';
 
 interface HomePageProps {
@@ -48,6 +48,9 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  // State for FAQ dropdowns
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
   const headingRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -170,6 +173,49 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     setMousePosition({ x, y });
   };
 
+  const faqItems = [
+    {
+      question: "What materials are your jewellery made of?",
+      answer: "Our pieces are made from high-quality materials such as stainless steel, gold plating, and premium alloys—designed to be durable, stylish, and long-lasting."
+    },
+    {
+      question: "Will the jewellery tarnish or fade?",
+      answer: "Our jewellery is designed to resist tarnishing, especially our stainless steel pieces. However, proper care (avoiding water, perfumes, and chemicals) helps maintain shine longer."
+    },
+    {
+      question: "Is your jewellery suitable for sensitive skin?",
+      answer: "Yes! Most of our pieces are hypoallergenic and safe for sensitive skin. If you have specific allergies, feel free to contact us before purchasing."
+    },
+    {
+      question: "How do I place an order?",
+      answer: "Simply browse our collection, add your favorite pieces to cart, and proceed to checkout. It’s quick and easy 💕"
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We only accept M-Pesa payments at the moments."
+    },
+    {
+      question: "How long does delivery take?",
+      answer: "Delivery typically takes 1–3 business days within major towns and slightly longer for other areas."
+    },
+    {
+      question: "Do you offer same-day delivery?",
+      answer: "Same-day delivery may be available in selected locations. Contact us to confirm availability."
+    },
+    {
+      question: "How much is delivery?",
+      answer: "Shipping costs vary depending on your location. The exact fee will be shown at checkout."
+    },
+    {
+      question: "How can I contact you?",
+      answer: "You can reach us via WhatsApp, Instagram, or email—we’re always happy to help 💕"
+    }
+  ];
+
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F6F2] relative overflow-x-hidden">
       <div className="fixed inset-0 pointer-events-none opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox=%220%200%20200%20200%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter%20id=%22noise%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.65%22%20numOctaves=%223%22%20stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23noise)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:200px]"></div>
@@ -191,10 +237,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               }`}
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
-              {/* Gradient overlay for text readability */}
               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10" />
-              
-              {/* Image: full coverage with object-cover, no extra scale */}
               <img
                 src={slide.image}
                 alt={slide.title}
@@ -204,7 +247,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   transition: 'transform 0.1s ease-out',
                 }}
               />
-
               <div className="absolute inset-0 z-20 flex items-center justify-start px-8 md:px-20 lg:px-32">
                 <div className="max-w-2xl text-left">
                   <h1
@@ -279,7 +321,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </div>
 
-      {/* Rest of the component remains unchanged from previous version */}
       {/* Featured Collections */}
       <section
         ref={(el) => (sectionsRef.current[0] = el)}
@@ -587,18 +628,87 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section
+        ref={(el) => (sectionsRef.current[5] = el)}
+        className="relative py-12 px-6 md:px-12 lg:px-24 overflow-hidden"
+      >
+        {/* Background image with very low opacity */}
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-10"
+          style={{ backgroundImage: "url('https://images.pexels.com/photos/6387626/pexels-photo-6387626.jpeg?auto=compress&cs=tinysrgb&w=1920')" }}
+        ></div>
+        {/* Dark shiny royal blue overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0A192F]/95 via-[#1E2A47]/90 to-[#0A192F]/95 backdrop-blur-[1px]"></div>
+        {/* Optional: add a subtle shiny radial highlight */}
+        <div className="absolute inset-0 bg-radial-gradient from-[#C4A747]/20 via-transparent to-transparent opacity-30"></div>
+
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <div
+            ref={(el) => (headingRefs.current[5] = el)}
+            className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+          >
+            <h2
+              className="text-4xl md:text-5xl font-semibold text-white mb-4"
+              style={{ fontFamily: 'Jolt, serif' }}
+            >
+              Frequently Asked Questions
+            </h2>
+            <p
+              className="text-gray-300 text-lg font-light max-w-2xl mx-auto"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
+              Everything you need to know about Boldify Jewelry
+            </p>
+            <div className="w-24 h-px bg-[#C4A747] mx-auto mt-6"></div>
+          </div>
+
+          <div className="space-y-4">
+            {faqItems.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg overflow-hidden transition-all duration-300 hover:border-[#C4A747]/50"
+              >
+                <button
+                  onClick={() => toggleFaq(index)}
+                  className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none"
+                >
+                  <span className="text-white font-semibold text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
+                    {item.question}
+                  </span>
+                  <ChevronDown
+                    className={`h-5 w-5 text-[#C4A747] transition-transform duration-300 ${
+                      openFaqIndex === index ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openFaqIndex === index ? 'max-h-96' : 'max-h-0'
+                  }`}
+                >
+                  <div className="px-6 pb-6 pt-2 text-gray-200 leading-relaxed border-t border-white/10">
+                    {item.answer}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Contact Section */}
       <section
         id="contact"
         ref={(el) => {
-          sectionsRef.current[5] = el;
+          sectionsRef.current[6] = el;
           contactRef.current = el;
         }}
         className="py-12 px-6 md:px-12 lg:px-24"
       >
         <div className="max-w-6xl mx-auto">
           <div
-            ref={(el) => (headingRefs.current[5] = el)}
+            ref={(el) => (headingRefs.current[6] = el)}
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
@@ -823,6 +933,9 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         }
         a, button, [role="button"] {
           cursor: pointer;
+        }
+        .bg-radial-gradient {
+          background: radial-gradient(circle at 50% 50%, rgba(196, 167, 71, 0.2) 0%, transparent 70%);
         }
       `}</style>
     </div>
