@@ -628,27 +628,27 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* FAQ Section - Enhanced with animated smoke & gold/white/black gradient washout */}
+      {/* FAQ Section - Background image made visible */}
       <section
         ref={(el) => (sectionsRef.current[5] = el)}
         className="relative py-12 px-6 md:px-12 lg:px-24 overflow-hidden"
       >
-        {/* Background image with very low opacity */}
+        {/* Background image with increased opacity for better visibility */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-10"
+          className="absolute inset-0 bg-cover bg-center opacity-100"
           style={{ backgroundImage: "url('https://images.pexels.com/photos/6387626/pexels-photo-6387626.jpeg?auto=compress&cs=tinysrgb&w=1920')" }}
         ></div>
 
-        {/* Main gradient overlay: gold → white → black, with fade to bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#C4A747]/40 via-white/30 to-black/60"></div>
+        {/* Reduced gradient overlay to make background more visible */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#C4A747]/20 via-white/20 to-black/30"></div>
 
-        {/* Animated smoke layer */}
-        <div className="absolute inset-0 opacity-30 pointer-events-none animate-smoke">
+        {/* Animated smoke layer - reduced opacity */}
+        <div className="absolute inset-0 opacity-15 pointer-events-none animate-smoke">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20200%20200%22%3E%3Cfilter%20id=%22smoke%22%3E%3CfeTurbulence%20baseFrequency=%220.01%22%20numOctaves=%223%22%20seed=%221%22/%3E%3CfeColorMatrix%20values=%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.3%200%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23smoke)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:400px] mix-blend-overlay animate-smokeMove"></div>
         </div>
 
         {/* Additional subtle radial shine */}
-        <div className="absolute inset-0 bg-radial-gradient from-[#C4A747]/20 via-transparent to-transparent opacity-40"></div>
+        <div className="absolute inset-0 bg-radial-gradient from-[#C4A747]/30 via-transparent to-transparent opacity-50"></div>
 
         <div className="relative z-10 max-w-4xl mx-auto">
           <div
@@ -662,7 +662,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               Frequently Asked Questions
             </h2>
             <p
-              className="text-gray-200 text-lg font-light max-w-2xl mx-auto drop-shadow"
+              className="text-gray-100 text-lg font-light max-w-2xl mx-auto drop-shadow"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               Everything you need to know about Boldify Jewelry
@@ -674,13 +674,13 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             {faqItems.map((item, index) => (
               <div
                 key={index}
-                className="bg-black/40 backdrop-blur-md border border-white/20 rounded-lg overflow-hidden transition-all duration-300 hover:border-[#C4A747]/70 shadow-lg"
+                className="bg-black/50 backdrop-blur-md border border-white/30 rounded-lg overflow-hidden transition-all duration-300 hover:border-[#C4A747]/80 shadow-lg"
               >
                 <button
                   onClick={() => toggleFaq(index)}
                   className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none group"
                 >
-                  <span className="text-white font-semibold text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  <span className="text-white font-semibold text-lg drop-shadow-sm" style={{ fontFamily: 'Playfair Display, serif' }}>
                     {item.question}
                   </span>
                   <ChevronDown
@@ -694,7 +694,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                     openFaqIndex === index ? 'max-h-96' : 'max-h-0'
                   }`}
                 >
-                  <div className="px-6 pb-6 pt-2 text-gray-100 leading-relaxed border-t border-white/10">
+                  <div className="px-6 pb-6 pt-2 text-gray-100 leading-relaxed border-t border-white/20 drop-shadow-sm">
                     {item.answer}
                   </div>
                 </div>
@@ -728,245 +728,3 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               className="text-[#4A4A4A] text-lg font-light max-w-2xl mx-auto"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
-              We'd love to hear from you
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-16">
-            <div className="space-y-10">
-              <div className="flex items-start space-x-5">
-                <Phone className="h-6 w-6 text-[#C4A747] mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="text-[#1A1A1A] font-bold mb-2 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
-                    Phone
-                  </h3>
-                  <a
-                    href="tel:+254798893450"
-                    className="text-[#666666] hover:text-[#C4A747] transition-colors duration-300"
-                    style={{ fontFamily: 'Marcellus, serif' }}
-                  >
-                    0798 893 450
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-5">
-                <Mail className="h-6 w-6 text-[#C4A747] mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="text-[#1A1A1A] font-bold mb-2 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
-                    Email
-                  </h3>
-                  <a
-                    href="mailto:boldifyjewelry@gmail.com"
-                    className="text-[#666666] hover:text-[#C4A747] transition-colors duration-300"
-                    style={{ fontFamily: 'Marcellus, serif' }}
-                  >
-                    boldifyjewelry@gmail.com
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-5">
-                <MessageCircle className="h-6 w-6 text-[#C4A747] mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="text-[#1A1A1A] font-bold mb-2 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
-                    WhatsApp
-                  </h3>
-                  <a
-                    href="https://wa.me/254798893450"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block bg-[#1A1A1A] text-white px-6 py-3 font-bold transition-all duration-300 hover:bg-[#C4A747] hover:text-black"
-                    style={{ fontFamily: 'Marcellus, serif' }}
-                  >
-                    CHAT WITH US
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <input
-                  type="text"
-                  placeholder="Your Name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-transparent border-b border-[#DDD] text-[#1A1A1A] px-0 py-3 focus:outline-none focus:border-[#C4A747] transition-colors duration-300 placeholder:text-[#AAA]"
-                  style={{ fontFamily: 'Marcellus, serif' }}
-                  required
-                />
-              </div>
-              <div>
-                <input
-                  type="email"
-                  placeholder="Your Email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-transparent border-b border-[#DDD] text-[#1A1A1A] px-0 py-3 focus:outline-none focus:border-[#C4A747] transition-colors duration-300 placeholder:text-[#AAA]"
-                  style={{ fontFamily: 'Marcellus, serif' }}
-                  required
-                />
-              </div>
-              <div>
-                <textarea
-                  placeholder="Your Message"
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  rows={5}
-                  className="w-full bg-transparent border-b border-[#DDD] text-[#1A1A1A] px-0 py-3 focus:outline-none focus:border-[#C4A747] transition-colors duration-300 resize-none placeholder:text-[#AAA]"
-                  style={{ fontFamily: 'Marcellus, serif' }}
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="group relative w-full bg-[#1A1A1A] text-white px-6 py-3 font-bold overflow-hidden transition-all duration-300 hover:bg-[#C4A747] hover:text-black"
-                style={{ fontFamily: 'Marcellus, serif' }}
-              >
-                <span className="relative z-10 flex items-center justify-center space-x-2">
-                  <span>SEND MESSAGE</span>
-                  <Send className="h-5 w-5" />
-                </span>
-                <span className="absolute inset-0 bg-[#C4A747] translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <div className="relative h-24 bg-gradient-to-t from-[#F1EFEA] to-transparent pointer-events-none"></div>
-
-      <footer className="bg-[#1A1A1A] text-white border-t border-[#C4A747]/20 py-12 px-6 md:px-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div className="text-center md:text-left">
-              <button
-                onClick={scrollToTop}
-                className="text-2xl font-bold text-[#C4A747] hover:text-white transition-colors duration-300"
-                style={{ fontFamily: 'Jolt, serif' }}
-              >
-                BOLDIFY
-              </button>
-              <p className="text-gray-400 text-sm mt-2" style={{ fontFamily: 'Marcellus, serif' }}>
-                Statement jewelry for the bold woman.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <h3 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Quick Links
-              </h3>
-              <ul className="space-y-2" style={{ fontFamily: 'Marcellus, serif' }}>
-                <li>
-                  <button onClick={scrollToTop} className="text-gray-400 hover:text-[#C4A747] transition-colors">
-                    Home
-                  </button>
-                </li>
-                <li>
-                  <button onClick={onNavigateToShop} className="text-gray-400 hover:text-[#C4A747] transition-colors">
-                    Shop
-                  </button>
-                </li>
-                <li>
-                  <a
-                    href="#about"
-                    onClick={(e) => handleAnchorClick(e, 'about')}
-                    className="text-gray-400 hover:text-[#C4A747] transition-colors"
-                  >
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#contact"
-                    onClick={(e) => handleAnchorClick(e, 'contact')}
-                    className="text-gray-400 hover:text-[#C4A747] transition-colors"
-                  >
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div className="text-center md:text-right">
-              <h3 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
-                Follow Us
-              </h3>
-              <div className="flex justify-center md:justify-end space-x-4">
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-[#C4A747] transition-colors"
-                >
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-[#C4A747] transition-colors"
-                >
-                  <Instagram className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://twitter.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-[#C4A747] transition-colors"
-                >
-                  <Twitter className="h-5 w-5" />
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-6 text-center">
-            <p className="text-gray-500 text-sm" style={{ fontFamily: 'Marcellus, serif' }}>
-              © 2026 Boldify Jewelry.Ke. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
-
-      <style jsx>{`
-        .visible {
-          opacity: 1 !important;
-          transform: translateY(0) !important;
-        }
-        html {
-          scroll-behavior: smooth;
-        }
-        a, button, [role="button"] {
-          cursor: pointer;
-        }
-        .bg-radial-gradient {
-          background: radial-gradient(circle at 50% 50%, rgba(196, 167, 71, 0.3) 0%, transparent 70%);
-        }
-        @keyframes smokeMove {
-          0% {
-            background-position: 0% 0%;
-          }
-          100% {
-            background-position: 200% 200%;
-          }
-        }
-        .animate-smokeMove {
-          animation: smokeMove 20s linear infinite;
-        }
-        .animate-smoke {
-          animation: smokeFade 8s ease-in-out infinite alternate;
-        }
-        @keyframes smokeFade {
-          0% {
-            opacity: 0.2;
-          }
-          100% {
-            opacity: 0.5;
-          }
-        }
-      `}</style>
-    </div>
-  );
-}
