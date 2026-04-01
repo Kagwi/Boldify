@@ -18,15 +18,12 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState<string>('all');
-  const [showCategorySection, setShowCategorySection] = useState(false);
 
   // Fetch products, categories, subcategories
   useEffect(() => {
     fetchProducts();
     fetchCategories();
     fetchSubcategories();
-    // Trigger slide down animation after component mounts
-    setTimeout(() => setShowCategorySection(true), 100);
   }, []);
 
   // Once categories are loaded, apply initialCategory if provided
@@ -130,7 +127,6 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black pt-20">
       <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Hero Section */}
         <div className="mb-12">
           <h1
             className="text-4xl md:text-6xl font-bold text-gold text-center mb-4"
@@ -146,64 +142,6 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
           </p>
         </div>
 
-        {/* Shop by Category Section */}
-        <div className={`mb-16 transition-all duration-700 ease-out transform ${
-          showCategorySection ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'
-        }`}>
-          <h2
-            className="text-3xl md:text-4xl font-bold text-gold text-center mb-8"
-            style={{ fontFamily: 'Jolt, serif' }}
-          >
-            Shop by Category
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                onClick={() => setSelectedCategory(category.slug)}
-                className="group cursor-pointer overflow-hidden bg-gray-900/50 border border-gray-800 hover:border-gold transition-all duration-300 rounded-lg"
-              >
-                <div className="relative h-48 md:h-64 overflow-hidden">
-                  <img
-                    src={category.image_url || '/api/placeholder/400/400'}
-                    alt={category.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-center">
-                    <h3
-                      className="text-xl md:text-2xl font-bold text-white mb-1"
-                      style={{ fontFamily: 'Playfair Display, serif' }}
-                    >
-                      {category.name}
-                    </h3>
-                    <p className="text-gold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      Shop Now →
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Featured Collections Title */}
-        <div className="mb-8">
-          <h2
-            className="text-3xl md:text-4xl font-bold text-gold text-center mb-2"
-            style={{ fontFamily: 'Jolt, serif' }}
-          >
-            Featured Collections
-          </h2>
-          <p
-            className="text-gray-400 text-center"
-            style={{ fontFamily: 'Marcellus, serif' }}
-          >
-            Handpicked pieces just for you
-          </p>
-        </div>
-
-        {/* Filters and Products Section */}
         <div className="mb-8 flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
