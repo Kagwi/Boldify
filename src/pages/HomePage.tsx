@@ -356,11 +356,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </div>
 
-      {/* Shop by Category Section - Moved here below hero section with black background */}
+      {/* Shop by Category Section - Pure Black Background */}
       {categories.length > 0 && (
         <section
           ref={(el) => (sectionsRef.current[0] = el)}
-          className="py-12 px-6 md:px-12 lg:px-24 bg-black"
+          className="py-12 px-6 md:px-12 lg:px-24"
+          style={{ backgroundColor: '#000000' }}
         >
           <div className="max-w-7xl mx-auto">
             <div
@@ -402,7 +403,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                       >
                         {category.name}
                       </h3>
-                      <div className="w-12 h-px bg-gold mx-auto mb-3"></div>
+                      <div className="w-12 h-px bg-[#C4A747] mx-auto mb-3"></div>
                       <p
                         className="text-white/80 text-sm"
                         style={{ fontFamily: 'Marcellus, serif' }}
