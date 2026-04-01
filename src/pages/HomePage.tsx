@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Star, Phone, Mail, MessageCircle, Send, Gem, Award, Heart, Facebook, Instagram, Twitter, ChevronDown } from 'lucide-react';
-import { supabase, Product, Review } from '../lib/supabase';
+import { useNavigate } from 'react-router-dom';  // assuming React Router is used
+import { supabase, Product, Review, Category } from '../lib/supabase';
 
 interface HomePageProps {
   onNavigateToShop: () => void;
@@ -40,16 +41,17 @@ const heroSlides = [
 ];
 
 export default function HomePage({ onNavigateToShop }: HomePageProps) {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryImages, setCategoryImages] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
-
-  // State for FAQ dropdowns
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
@@ -58,10 +60,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const aboutRef = useRef<HTMLElement | null>(null);
   const contactRef = useRef<HTMLElement | null>(null);
 
+  // Fetch data on mount
   useEffect(() => {
     fetchFeaturedProducts();
     fetchNewArrivals();
     fetchReviews();
+    fetchCategories();
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -72,6 +76,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     return () => clearInterval(interval);
   }, []);
 
+  // Intersection Observer for scroll reveals
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -97,6 +102,35 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
 
     return () => observer.disconnect();
   }, []);
+
+  // Fetch categories
+  const fetchCategories = async () => {
+    const { data } = await supabase.from('categories').select('*');
+    if (data) {
+      setCategories(data);
+      // For each category, fetch a product image
+      await fetchCategoryImages(data);
+    }
+  };
+
+  // Fetch one product image per category to use as representative
+  const fetchCategoryImages = async (categories: Category[]) => {
+    const images: Record<string, string> = {};
+    for (const category of categories) {
+      const { data } = await supabase
+        .from('products')
+        .select('image_url')
+        .eq('category_id', category.id)
+        .limit(1);
+      if (data && data.length > 0) {
+        images[category.id] = data[0].image_url;
+      } else {
+        // Fallback image if no products in category
+        images[category.id] = 'https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=800';
+      }
+    }
+    setCategoryImages(images);
+  };
 
   const fetchFeaturedProducts = async () => {
     const { data } = await supabase
@@ -171,6 +205,10 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
     setMousePosition({ x, y });
+  };
+
+  const navigateToCategory = (categorySlug: string) => {
+    navigate(`/shop?category=${categorySlug}`);
   };
 
   const faqItems = [
@@ -463,14 +501,76 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
+      {/* Shop by Category Section */}
+      {categories.length > 0 && (
+        <section
+          ref={(el) => (sectionsRef.current[2] = el)}
+          className="py-12 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#F8F6F2]"
+        >
+          <div className="max-w-7xl mx-auto">
+            <div
+              ref={(el) => (headingRefs.current[2] = el)}
+              className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+            >
+              <h2
+                className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
+                style={{ fontFamily: 'Jolt, serif' }}
+              >
+                Shop by Category
+              </h2>
+              <p
+                className="text-[#4A4A4A] text-lg font-light max-w-2xl mx-auto"
+                style={{ fontFamily: 'Playfair Display, serif' }}
+              >
+                Find your perfect piece by exploring our curated collections
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+              {categories.map((category) => (
+                <div
+                  key={category.id}
+                  onClick={() => navigateToCategory(category.slug)}
+                  className="group cursor-pointer overflow-hidden rounded-lg shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
+                >
+                  <div className="relative h-64 overflow-hidden">
+                    <img
+                      src={categoryImages[category.id] || 'https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=800'}
+                      alt={category.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
+                      <h3
+                        className="text-2xl font-bold text-white mb-2"
+                        style={{ fontFamily: 'Playfair Display, serif' }}
+                      >
+                        {category.name}
+                      </h3>
+                      <div className="w-12 h-px bg-gold mx-auto mb-3"></div>
+                      <p
+                        className="text-white/80 text-sm"
+                        style={{ fontFamily: 'Marcellus, serif' }}
+                      >
+                        Shop Now →
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* The Boldify Experience */}
       <section
-        ref={(el) => (sectionsRef.current[2] = el)}
+        ref={(el) => (sectionsRef.current[3] = el)}
         className="py-12 px-6 md:px-12 lg:px-24 bg-[#0A192F]"
       >
         <div className="max-w-7xl mx-auto">
           <div
-            ref={(el) => (headingRefs.current[2] = el)}
+            ref={(el) => (headingRefs.current[3] = el)}
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
@@ -530,12 +630,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
 
       {/* Customer Reviews */}
       <section
-        ref={(el) => (sectionsRef.current[3] = el)}
+        ref={(el) => (sectionsRef.current[4] = el)}
         className="py-12 px-6 md:px-12 lg:px-24"
       >
         <div className="max-w-7xl mx-auto">
           <div
-            ref={(el) => (headingRefs.current[3] = el)}
+            ref={(el) => (headingRefs.current[4] = el)}
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
@@ -584,7 +684,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
       <section
         id="about"
         ref={(el) => {
-          sectionsRef.current[4] = el;
+          sectionsRef.current[5] = el;
           aboutRef.current = el;
         }}
         className="relative py-12 px-6 md:px-12 lg:px-24 bg-cover bg-center"
@@ -593,7 +693,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <div className="absolute inset-0 bg-black/70"></div>
         <div className="relative z-10 max-w-6xl mx-auto">
           <div
-            ref={(el) => (headingRefs.current[4] = el)}
+            ref={(el) => (headingRefs.current[5] = el)}
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
@@ -628,31 +728,24 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </section>
 
-      {/* FAQ Section - Enhanced with animated smoke & gold/white/black gradient washout */}
+      {/* FAQ Section */}
       <section
-        ref={(el) => (sectionsRef.current[5] = el)}
+        ref={(el) => (sectionsRef.current[6] = el)}
         className="relative py-12 px-6 md:px-12 lg:px-24 overflow-hidden"
       >
-        {/* Background image with very low opacity */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-10"
           style={{ backgroundImage: "url('https://images.pexels.com/photos/6387626/pexels-photo-6387626.jpeg?auto=compress&cs=tinysrgb&w=1920')" }}
         ></div>
-
-        {/* Main gradient overlay: gold → white → black, with fade to bottom */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#C4A747]/40 via-white/30 to-black/60"></div>
-
-        {/* Animated smoke layer */}
         <div className="absolute inset-0 opacity-30 pointer-events-none animate-smoke">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20200%20200%22%3E%3Cfilter%20id=%22smoke%22%3E%3CfeTurbulence%20baseFrequency=%220.01%22%20numOctaves=%223%22%20seed=%221%22/%3E%3CfeColorMatrix%20values=%220%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.3%200%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23smoke)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:400px] mix-blend-overlay animate-smokeMove"></div>
         </div>
-
-        {/* Additional subtle radial shine */}
         <div className="absolute inset-0 bg-radial-gradient from-[#C4A747]/20 via-transparent to-transparent opacity-40"></div>
 
         <div className="relative z-10 max-w-4xl mx-auto">
           <div
-            ref={(el) => (headingRefs.current[5] = el)}
+            ref={(el) => (headingRefs.current[6] = el)}
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
@@ -708,14 +801,14 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
       <section
         id="contact"
         ref={(el) => {
-          sectionsRef.current[6] = el;
+          sectionsRef.current[7] = el;
           contactRef.current = el;
         }}
         className="py-12 px-6 md:px-12 lg:px-24"
       >
         <div className="max-w-6xl mx-auto">
           <div
-            ref={(el) => (headingRefs.current[6] = el)}
+            ref={(el) => (headingRefs.current[7] = el)}
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
