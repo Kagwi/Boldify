@@ -356,32 +356,32 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </div>
 
-      {/* Shop by Category Section - Pure Black Background */}
-      {categories.length > 0 && (
-        <section
-          ref={(el) => (sectionsRef.current[0] = el)}
-          className="py-12 px-6 md:px-12 lg:px-24"
-          style={{ backgroundColor: '#000000' }}
-        >
-          <div className="max-w-7xl mx-auto">
-            <div
-              ref={(el) => (headingRefs.current[0] = el)}
-              className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+            {/* Shop by Category Section - Pure Black Background */}
+      <section
+        ref={(el) => (sectionsRef.current[0] = el)}
+        className="py-12 px-6 md:px-12 lg:px-24"
+        style={{ backgroundColor: '#000000' }}
+      >
+        <div className="max-w-7xl mx-auto">
+          <div
+            ref={(el) => (headingRefs.current[0] = el)}
+            className="mb-12 text-center"
+          >
+            <h2
+              className="text-4xl md:text-5xl font-semibold text-white mb-4 tracking-tight"
+              style={{ fontFamily: 'Jolt, serif' }}
             >
-              <h2
-                className="text-4xl md:text-5xl font-semibold text-white mb-4 tracking-tight"
-                style={{ fontFamily: 'Jolt, serif' }}
-              >
-                Shop by Category
-              </h2>
-              <p
-                className="text-gray-300 text-lg font-light max-w-2xl mx-auto"
-                style={{ fontFamily: 'Playfair Display, serif' }}
-              >
-                Find your perfect piece by exploring our curated collections
-              </p>
-            </div>
+              Shop by Category
+            </h2>
+            <p
+              className="text-gray-300 text-lg font-light max-w-2xl mx-auto"
+              style={{ fontFamily: 'Playfair Display, serif' }}
+            >
+              Find your perfect piece by exploring our curated collections
+            </p>
+          </div>
 
+          {categories.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
               {categories.map((category) => (
                 <div
@@ -415,9 +415,13 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          ) : (
+            <div className="text-center text-white py-12">
+              <p className="text-gray-300">Loading categories...</p>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Featured Collections */}
       <section
