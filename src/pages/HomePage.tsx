@@ -356,14 +356,76 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </div>
 
+      {/* Shop by Category Section - Moved here below hero section */}
+      {categories.length > 0 && (
+        <section
+          ref={(el) => (sectionsRef.current[0] = el)}
+          className="py-12 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#F8F6F2]"
+        >
+          <div className="max-w-7xl mx-auto">
+            <div
+              ref={(el) => (headingRefs.current[0] = el)}
+              className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+            >
+              <h2
+                className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4 tracking-tight"
+                style={{ fontFamily: 'Jolt, serif' }}
+              >
+                Shop by Category
+              </h2>
+              <p
+                className="text-[#4A4A4A] text-lg font-light max-w-2xl mx-auto"
+                style={{ fontFamily: 'Playfair Display, serif' }}
+              >
+                Find your perfect piece by exploring our curated collections
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+              {categories.map((category) => (
+                <div
+                  key={category.id}
+                  onClick={() => navigateToCategory(category.slug)}
+                  className="group cursor-pointer overflow-hidden rounded-lg shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
+                >
+                  <div className="relative h-64 overflow-hidden">
+                    <img
+                      src={categoryImages[category.id] || 'https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=800'}
+                      alt={category.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
+                      <h3
+                        className="text-2xl font-bold text-white mb-2"
+                        style={{ fontFamily: 'Playfair Display, serif' }}
+                      >
+                        {category.name}
+                      </h3>
+                      <div className="w-12 h-px bg-gold mx-auto mb-3"></div>
+                      <p
+                        className="text-white/80 text-sm"
+                        style={{ fontFamily: 'Marcellus, serif' }}
+                      >
+                        Shop Now →
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Featured Collections */}
       <section
-        ref={(el) => (sectionsRef.current[0] = el)}
+        ref={(el) => (sectionsRef.current[1] = el)}
         className="py-12 px-6 md:px-12 lg:px-24"
       >
         <div className="max-w-7xl mx-auto">
           <div
-            ref={(el) => (headingRefs.current[0] = el)}
+            ref={(el) => (headingRefs.current[1] = el)}
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
@@ -429,12 +491,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
 
       {/* New Arrivals */}
       <section
-        ref={(el) => (sectionsRef.current[1] = el)}
+        ref={(el) => (sectionsRef.current[2] = el)}
         className="py-12 px-6 md:px-12 lg:px-24 bg-[#F1EFEA]"
       >
         <div className="max-w-7xl mx-auto">
           <div
-            ref={(el) => (headingRefs.current[1] = el)}
+            ref={(el) => (headingRefs.current[2] = el)}
             className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
           >
             <h2
@@ -497,68 +559,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
           </div>
         </div>
       </section>
-
-      {/* Shop by Category Section */}
-      {categories.length > 0 && (
-        <section
-          ref={(el) => (sectionsRef.current[2] = el)}
-          className="py-12 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-white to-[#F8F6F2]"
-        >
-          <div className="max-w-7xl mx-auto">
-            <div
-              ref={(el) => (headingRefs.current[2] = el)}
-              className="mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
-            >
-              <h2
-                className="text-4xl md:text-5xl font-semibold text-[#1A1A1A] mb-4"
-                style={{ fontFamily: 'Jolt, serif' }}
-              >
-                Shop by Category
-              </h2>
-              <p
-                className="text-[#4A4A4A] text-lg font-light max-w-2xl mx-auto"
-                style={{ fontFamily: 'Playfair Display, serif' }}
-              >
-                Find your perfect piece by exploring our curated collections
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
-              {categories.map((category) => (
-                <div
-                  key={category.id}
-                  onClick={() => navigateToCategory(category.slug)}
-                  className="group cursor-pointer overflow-hidden rounded-lg shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
-                >
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={categoryImages[category.id] || 'https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=800'}
-                      alt={category.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
-                      <h3
-                        className="text-2xl font-bold text-white mb-2"
-                        style={{ fontFamily: 'Playfair Display, serif' }}
-                      >
-                        {category.name}
-                      </h3>
-                      <div className="w-12 h-px bg-gold mx-auto mb-3"></div>
-                      <p
-                        className="text-white/80 text-sm"
-                        style={{ fontFamily: 'Marcellus, serif' }}
-                      >
-                        Shop Now →
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* The Boldify Experience */}
       <section
