@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Star, Phone, Mail, MessageCircle, Send, Gem,
 import { supabase, Product, Review, Category } from '../lib/supabase';
 
 interface HomePageProps {
-  onNavigateToShop: (categorySlug?: string) => void;  // updated to accept optional category slug
+  onNavigateToShop: (categorySlug?: string) => void;
 }
 
 const heroSlides = [
@@ -51,6 +51,9 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const heroRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [loadingReviews, setLoadingReviews] = useState(true);
 
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
   const headingRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -101,27 +104,64 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     return () => observer.disconnect();
   }, []);
 
-  // Fetch categories and their representative images
+  // Fetch categories and ensure "Watches" exists
   const fetchCategories = async () => {
-    const { data } = await supabase.from('categories').select('*');
-    if (data) {
-      setCategories(data);
-      await fetchCategoryImages(data);
+    setLoadingCategories(true);
+    try {
+      const { data, error } = await supabase.from('categories').select('*');
+      if (error) throw error;
+      let cats = data || [];
+
+      // Check if "Watches" category already exists (by name or slug)
+      const hasWatches = cats.some(c => c.name.toLowerCase() === 'watches' || c.slug === 'watches');
+      if (!hasWatches) {
+        // Create a temporary "Watches" category (only for frontend display)
+        // In a real app you would insert it into the database, but here we simulate.
+        const watchesCategory: Category = {
+          id: 'watches-temp-id',
+          name: 'Watches',
+          slug: 'watches',
+          created_at: new Date().toISOString(),
+        };
+        cats = [...cats, watchesCategory];
+      }
+
+      setCategories(cats);
+      await fetchCategoryImages(cats);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      // Fallback: at least show a Watches category
+      setCategories([{
+        id: 'fallback-watches',
+        name: 'Watches',
+        slug: 'watches',
+        created_at: new Date().toISOString(),
+      }]);
+    } finally {
+      setLoadingCategories(false);
     }
   };
 
   const fetchCategoryImages = async (categories: Category[]) => {
     const images: Record<string, string> = {};
     for (const category of categories) {
-      const { data } = await supabase
-        .from('products')
-        .select('image_url')
-        .eq('category_id', category.id)
-        .limit(1);
-      if (data && data.length > 0) {
-        images[category.id] = data[0].image_url;
-      } else {
-        // Fallback image if no products in category
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('image_url')
+          .eq('category_id', category.id)
+          .limit(1);
+        if (!error && data && data.length > 0) {
+          images[category.id] = data[0].image_url;
+        } else {
+          // Fallback image based on category name
+          if (category.name.toLowerCase() === 'watches') {
+            images[category.id] = 'https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=800';
+          } else {
+            images[category.id] = 'https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=800';
+          }
+        }
+      } catch {
         images[category.id] = 'https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=800';
       }
     }
@@ -129,31 +169,52 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   };
 
   const fetchFeaturedProducts = async () => {
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-      .eq('is_featured', true)
-      .limit(4);
-    if (data) setFeaturedProducts(data);
+    setLoadingProducts(true);
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_featured', true)
+        .limit(4);
+      if (error) throw error;
+      if (data) setFeaturedProducts(data);
+    } catch (err) {
+      console.error('Error fetching featured products:', err);
+    } finally {
+      setLoadingProducts(false);
+    }
   };
 
   const fetchNewArrivals = async () => {
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-      .eq('is_new_arrival', true)
-      .order('created_at', { ascending: false })
-      .limit(4);
-    if (data) setNewArrivals(data);
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_new_arrival', true)
+        .order('created_at', { ascending: false })
+        .limit(4);
+      if (error) throw error;
+      if (data) setNewArrivals(data);
+    } catch (err) {
+      console.error('Error fetching new arrivals:', err);
+    }
   };
 
   const fetchReviews = async () => {
-    const { data } = await supabase
-      .from('reviews')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(6);
-    if (data) setReviews(data);
+    setLoadingReviews(true);
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      if (data) setReviews(data);
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+    } finally {
+      setLoadingReviews(false);
+    }
   };
 
   const nextSlide = () => {
@@ -204,7 +265,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   };
 
   const navigateToCategory = (categorySlug: string) => {
-    // Call the parent's navigation function with the category slug
     onNavigateToShop(categorySlug);
   };
 
@@ -267,7 +327,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
           return (
             <div
               key={index}
-              className={`absolute inset-0 transition-all duration-1500 ease-out ${
+              className={`absolute inset-0 transition-all duration-1000 ease-out ${
                 index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
               }`}
               style={{ transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
@@ -285,7 +345,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
               <div className="absolute inset-0 z-20 flex items-center justify-start px-8 md:px-20 lg:px-32">
                 <div className="max-w-2xl text-left">
                   <h1
-                    className={`text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight transition-all duration-900 ${
+                    className={`text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight transition-all duration-700 ${
                       isAnimating
                         ? 'opacity-0 -translate-y-6 scale-95 rotate-2'
                         : 'opacity-100 translate-y-0 scale-100 rotate-0'
@@ -295,7 +355,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                     {slide.title}
                   </h1>
                   <p
-                    className={`text-xl md:text-3xl text-white/90 mb-12 font-light tracking-wide transition-all duration-900 delay-150 ${
+                    className={`text-xl md:text-3xl text-white/90 mb-12 font-light tracking-wide transition-all duration-700 delay-150 ${
                       isAnimating
                         ? 'opacity-0 -translate-y-4 scale-95'
                         : 'opacity-100 translate-y-0 scale-100'
@@ -306,7 +366,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   </p>
                   <button
                     onClick={() => onNavigateToShop()}
-                    className={`group bg-transparent border-2 border-white text-white px-12 py-4 text-lg font-bold hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 hover:shadow-2xl transition-all duration-900 delay-300 ${
+                    className={`group bg-transparent border-2 border-white text-white px-12 py-4 text-lg font-bold hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 hover:shadow-2xl ${
                       isAnimating
                         ? 'opacity-0 translate-y-4'
                         : 'opacity-100 translate-y-0'
@@ -327,12 +387,14 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         <button
           onClick={prevSlide}
           className="absolute left-6 top-1/2 -translate-y-1/2 z-30 bg-black/40 backdrop-blur-sm hover:bg-white/90 text-white hover:text-black p-3 transition-all duration-300 rounded-full focus:outline-none"
+          aria-label="Previous slide"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
         <button
           onClick={nextSlide}
           className="absolute right-6 top-1/2 -translate-y-1/2 z-30 bg-black/40 backdrop-blur-sm hover:bg-white/90 text-white hover:text-black p-3 transition-all duration-300 rounded-full focus:outline-none"
+          aria-label="Next slide"
         >
           <ChevronRight className="h-6 w-6" />
         </button>
@@ -351,12 +413,13 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   ? 'w-8 h-1 bg-white'
                   : 'w-2 h-1 bg-white/50 hover:bg-white/80'
               }`}
+              aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
       </div>
 
-            {/* Shop by Category Section - Pure Black Background */}
+      {/* Shop by Category Section - Pure Black Background */}
       <section
         ref={(el) => (sectionsRef.current[0] = el)}
         className="py-12 px-6 md:px-12 lg:px-24"
@@ -381,7 +444,11 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             </p>
           </div>
 
-          {categories.length > 0 ? (
+          {loadingCategories ? (
+            <div className="text-center text-white py-12">
+              <p className="text-gray-300">Loading categories...</p>
+            </div>
+          ) : categories.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
               {categories.map((category) => (
                 <div
@@ -417,7 +484,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             </div>
           ) : (
             <div className="text-center text-white py-12">
-              <p className="text-gray-300">Loading categories...</p>
+              <p className="text-gray-300">No categories found.</p>
             </div>
           )}
         </div>
@@ -447,50 +514,56 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-            {featuredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="group relative cursor-pointer bg-white/80 backdrop-blur-sm border border-[#E5E5E5] hover:border-[#C4A747] transition-all duration-500 hover:shadow-2xl"
-                style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.9, 0.4, 1.1)' }}
-              >
-                <div className="relative h-80 overflow-hidden bg-[#FAFAFA]">
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125 will-change-transform"
-                    style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.95, 0.4, 1.05)' }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </div>
-                <div className="p-6">
-                  <h3
-                    className="text-xl font-semibold text-[#1A1A1A] mb-2"
-                    style={{ fontFamily: 'Playfair Display, serif' }}
-                  >
-                    {product.name}
-                  </h3>
-                  <p className="text-[#666666] text-sm mb-4 line-clamp-2" style={{ fontFamily: 'Marcellus, serif' }}>
-                    {product.description}
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-[#C4A747]" style={{ fontFamily: 'Jolt, serif' }}>
-                      Ksh {product.price.toLocaleString()}
-                    </span>
-                    <a
-                      href={getWhatsAppLink(product)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="relative overflow-hidden bg-[#1A1A1A] text-white px-5 py-2 text-sm font-bold transition-all duration-300 hover:bg-[#C4A747] hover:text-black group/btn"
+          {loadingProducts && featuredProducts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Loading products...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+              {featuredProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="group relative cursor-pointer bg-white/80 backdrop-blur-sm border border-[#E5E5E5] hover:border-[#C4A747] transition-all duration-500 hover:shadow-2xl"
+                  style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.9, 0.4, 1.1)' }}
+                >
+                  <div className="relative h-80 overflow-hidden bg-[#FAFAFA]">
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125 will-change-transform"
+                      style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.95, 0.4, 1.05)' }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  </div>
+                  <div className="p-6">
+                    <h3
+                      className="text-xl font-semibold text-[#1A1A1A] mb-2"
+                      style={{ fontFamily: 'Playfair Display, serif' }}
                     >
-                      <span className="relative z-10">ORDER</span>
-                      <span className="absolute inset-0 bg-[#C4A747] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></span>
-                    </a>
+                      {product.name}
+                    </h3>
+                    <p className="text-[#666666] text-sm mb-4 line-clamp-2" style={{ fontFamily: 'Marcellus, serif' }}>
+                      {product.description}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-2xl font-bold text-[#C4A747]" style={{ fontFamily: 'Jolt, serif' }}>
+                        Ksh {product.price.toLocaleString()}
+                      </span>
+                      <a
+                        href={getWhatsAppLink(product)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="relative overflow-hidden bg-[#1A1A1A] text-white px-5 py-2 text-sm font-bold transition-all duration-300 hover:bg-[#C4A747] hover:text-black group/btn"
+                      >
+                        <span className="relative z-10">ORDER</span>
+                        <span className="absolute inset-0 bg-[#C4A747] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></span>
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -654,31 +727,37 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {reviews.map((review) => (
-              <div
-                key={review.id}
-                className="bg-white border border-[#E5E5E5] p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:border-[#C4A747]"
-              >
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-5 w-5 ${
-                        i < review.rating ? 'text-[#C4A747] fill-[#C4A747]' : 'text-[#DDD]'
-                      }`}
-                    />
-                  ))}
+          {loadingReviews ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Loading reviews...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="bg-white border border-[#E5E5E5] p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:border-[#C4A747]"
+                >
+                  <div className="flex mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-5 w-5 ${
+                          i < review.rating ? 'text-[#C4A747] fill-[#C4A747]' : 'text-[#DDD]'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-[#333] mb-6 italic text-base leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
+                    "{review.comment}"
+                  </p>
+                  <p className="text-[#C4A747] font-semibold tracking-wide" style={{ fontFamily: 'Playfair Display, serif' }}>
+                    {review.customer_name}
+                  </p>
                 </div>
-                <p className="text-[#333] mb-6 italic text-base leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>
-                  "{review.comment}"
-                </p>
-                <p className="text-[#C4A747] font-semibold tracking-wide" style={{ fontFamily: 'Playfair Display, serif' }}>
-                  {review.customer_name}
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -774,6 +853,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                 <button
                   onClick={() => toggleFaq(index)}
                   className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none group"
+                  aria-expanded={openFaqIndex === index}
                 >
                   <span className="text-white font-semibold text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
                     {item.question}
@@ -994,6 +1074,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-[#C4A747] transition-colors"
+                  aria-label="Facebook"
                 >
                   <Facebook className="h-5 w-5" />
                 </a>
@@ -1002,6 +1083,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-[#C4A747] transition-colors"
+                  aria-label="Instagram"
                 >
                   <Instagram className="h-5 w-5" />
                 </a>
@@ -1010,6 +1092,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-[#C4A747] transition-colors"
+                  aria-label="Twitter"
                 >
                   <Twitter className="h-5 w-5" />
                 </a>
@@ -1025,7 +1108,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </footer>
 
-      <style jsx>{`
+      <style>{`
         .visible {
           opacity: 1 !important;
           transform: translateY(0) !important;
