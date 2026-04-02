@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Search, X, Heart, Filter } from 'lucide-react';
 import { supabase, Product, Category, Subcategory } from '../lib/supabase';
 
 interface ShopPageProps {
   onWishlistChange: (count: number) => void;
-  initialCategory?: string | null; // new prop
+  initialCategory?: string | null;
 }
 
 export default function ShopPage({ onWishlistChange, initialCategory }: ShopPageProps) {
   const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -18,56 +17,106 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState<string>('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch products, categories, subcategories
+  // Load wishlist from localStorage on mount
   useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-    fetchSubcategories();
+    const savedWishlist = localStorage.getItem('boldify_wishlist');
+    if (savedWishlist) {
+      try {
+        const arr = JSON.parse(savedWishlist);
+        setWishlist(new Set(arr));
+        onWishlistChange(arr.length);
+      } catch (e) {}
+    }
+  }, [onWishlistChange]);
+
+  // Save wishlist to localStorage whenever it changes
+  useEffect(() => {
+    const wishlistArray = Array.from(wishlist);
+    localStorage.setItem('boldify_wishlist', JSON.stringify(wishlistArray));
+    onWishlistChange(wishlistArray.length);
+  }, [wishlist, onWishlistChange]);
+
+  // Fetch data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        await Promise.all([fetchProducts(), fetchCategories(), fetchSubcategories()]);
+      } catch (err) {
+        console.error('Error fetching shop data:', err);
+        setError('Failed to load products. Please refresh the page.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   // Once categories are loaded, apply initialCategory if provided
   useEffect(() => {
     if (categories.length > 0 && initialCategory && !selectedCategory) {
-      // Check if the category exists
       const categoryExists = categories.some(c => c.slug === initialCategory);
       if (categoryExists) {
         setSelectedCategory(initialCategory);
       }
     }
-  }, [categories, initialCategory]);
+  }, [categories, initialCategory, selectedCategory]);
 
-  // Re‑filter whenever relevant state changes
-  useEffect(() => {
-    filterProducts();
-  }, [products, selectedCategory, selectedSubcategory, searchQuery, priceRange]);
-
+  // --- Fetch functions with error handling ---
   const fetchProducts = async () => {
-    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
     if (data) setProducts(data);
   };
 
   const fetchCategories = async () => {
-    const { data } = await supabase.from('categories').select('*');
-    if (data) setCategories(data);
+    let { data, error } = await supabase.from('categories').select('*');
+    if (error) throw error;
+    let cats = data || [];
+
+    // Ensure "Watches" category exists (by slug 'watches')
+    const hasWatches = cats.some(c => c.slug === 'watches');
+    if (!hasWatches) {
+      const watchesCategory: Category = {
+        id: 'watches-temp-id',
+        name: 'Watches',
+        slug: 'watches',
+        created_at: new Date().toISOString(),
+      };
+      cats = [...cats, watchesCategory];
+    }
+
+    setCategories(cats);
   };
 
   const fetchSubcategories = async () => {
-    const { data } = await supabase.from('subcategories').select('*');
+    const { data, error } = await supabase.from('subcategories').select('*');
+    if (error) throw error;
     if (data) setSubcategories(data);
   };
 
-  const filterProducts = () => {
+  // --- Filtering logic (useMemo for performance) ---
+  const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
     if (selectedCategory) {
       const category = categories.find((c) => c.slug === selectedCategory);
-      if (category) {
+      if (category && category.id !== 'watches-temp-id') {
         filtered = filtered.filter((p) => p.category_id === category.id);
+      } else if (category && category.id === 'watches-temp-id') {
+        // Temporary category – no products will match unless you add watches to DB
+        filtered = [];
       }
     }
 
-    if (selectedSubcategory) {
+    if (selectedSubcategory && filtered.length > 0) {
       const subcategory = subcategories.find((s) => s.slug === selectedSubcategory);
       if (subcategory) {
         filtered = filtered.filter((p) => p.subcategory_id === subcategory.id);
@@ -91,18 +140,17 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
       });
     }
 
-    setFilteredProducts(filtered);
-  };
+    return filtered;
+  }, [products, categories, subcategories, selectedCategory, selectedSubcategory, searchQuery, priceRange]);
 
+  // --- Helper functions ---
   const toggleWishlist = (productId: string) => {
-    const newWishlist = new Set(wishlist);
-    if (newWishlist.has(productId)) {
-      newWishlist.delete(productId);
-    } else {
-      newWishlist.add(productId);
-    }
-    setWishlist(newWishlist);
-    onWishlistChange(newWishlist.size);
+    setWishlist(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(productId)) newSet.delete(productId);
+      else newSet.add(productId);
+      return newSet;
+    });
   };
 
   const clearFilters = () => {
@@ -120,9 +168,25 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
   const availableSubcategories = selectedCategory
     ? subcategories.filter((s) => {
         const category = categories.find((c) => c.slug === selectedCategory);
-        return category && s.category_id === category.id;
+        return category && s.category_id === category.id && category.id !== 'watches-temp-id';
       })
     : [];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black pt-20 flex items-center justify-center">
+        <div className="text-gold text-xl">Loading shop...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black pt-20 flex items-center justify-center">
+        <div className="text-red-500 text-xl">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black pt-20">
@@ -152,12 +216,14 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-gray-900 border border-gray-800 text-white pl-12 pr-4 py-3 focus:outline-none focus:border-gold transition-colors"
               style={{ fontFamily: 'Marcellus, serif' }}
+              aria-label="Search products"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="bg-gold text-black px-6 py-3 font-bold hover:bg-gold/90 transition-colors flex items-center justify-center space-x-2"
             style={{ fontFamily: 'Marcellus, serif' }}
+            aria-expanded={showFilters}
           >
             <Filter className="h-5 w-5" />
             <span>FILTERS</span>
@@ -219,7 +285,7 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
                 <select
                   value={selectedSubcategory}
                   onChange={(e) => setSelectedSubcategory(e.target.value)}
-                  disabled={!selectedCategory}
+                  disabled={!selectedCategory || selectedCategory === 'watches'}
                   className="w-full bg-gray-900 border border-gray-800 text-white px-4 py-3 focus:outline-none focus:border-gold transition-colors disabled:opacity-50"
                   style={{ fontFamily: 'Marcellus, serif' }}
                 >
@@ -284,10 +350,12 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
                     src={product.image_url}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
                   />
                   <button
                     onClick={() => toggleWishlist(product.id)}
                     className="absolute top-4 right-4 bg-black/50 hover:bg-black p-2 transition-colors duration-300"
+                    aria-label={wishlist.has(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
                   >
                     <Heart
                       className={`h-5 w-5 ${
