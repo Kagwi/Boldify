@@ -4,42 +4,19 @@ import { supabase, Product, Review, Category } from '../lib/supabase';
 
 interface HomePageProps {
   onNavigateToShop: (categorySlug?: string) => void;
+  onWishlistChange: (count: number) => void;
 }
 
 const heroSlides = [
-  {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45.jpeg?raw=true',
-    title: 'Bold Pieces for Bold Women',
-    subtitle: 'Elevate Your Style',
-  },
-  {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44.jpeg?raw=true',
-    title: 'Statement Elegance',
-    subtitle: 'Make Every Moment Count',
-  },
-  {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45%20(1).jpeg?raw=true',
-    title: 'Luxury Redefined',
-    subtitle: 'Discover Your Bold',
-  },
-  {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44%20(2).jpeg?raw=true',
-    title: 'Timeless Craftsmanship',
-    subtitle: 'Every Piece Tells a Story',
-  },
-  {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44%20(1).jpeg?raw=true',
-    title: 'Modern Elegance',
-    subtitle: 'Designed for You',
-  },
-  {
-    image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-28%20at%2000.05.21.jpeg?raw=true',
-    title: 'Uniquely Yours',
-    subtitle: 'Celebrate Your Individuality',
-  },
+  { image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45.jpeg?raw=true', title: 'Bold Pieces for Bold Women', subtitle: 'Elevate Your Style' },
+  { image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44.jpeg?raw=true', title: 'Statement Elegance', subtitle: 'Make Every Moment Count' },
+  { image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.45%20(1).jpeg?raw=true', title: 'Luxury Redefined', subtitle: 'Discover Your Bold' },
+  { image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44%20(2).jpeg?raw=true', title: 'Timeless Craftsmanship', subtitle: 'Every Piece Tells a Story' },
+  { image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-27%20at%2008.51.44%20(1).jpeg?raw=true', title: 'Modern Elegance', subtitle: 'Designed for You' },
+  { image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-28%20at%2000.05.21.jpeg?raw=true', title: 'Uniquely Yours', subtitle: 'Celebrate Your Individuality' },
 ];
 
-export default function HomePage({ onNavigateToShop }: HomePageProps) {
+export default function HomePage({ onNavigateToShop, onWishlistChange }: HomePageProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
@@ -54,6 +31,38 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
+
+  // Wishlist state
+  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
+
+  // Load wishlist from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('boldify_wishlist');
+    if (saved) {
+      try {
+        const arr = JSON.parse(saved);
+        setWishlist(new Set(arr));
+        onWishlistChange(arr.length);
+      } catch (e) {}
+    }
+  }, [onWishlistChange]);
+
+  // Save wishlist to localStorage and notify parent
+  useEffect(() => {
+    const arr = Array.from(wishlist);
+    localStorage.setItem('boldify_wishlist', JSON.stringify(arr));
+    onWishlistChange(arr.length);
+  }, [wishlist, onWishlistChange]);
+
+  const toggleWishlist = (productId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setWishlist(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(productId)) newSet.delete(productId);
+      else newSet.add(productId);
+      return newSet;
+    });
+  };
 
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
   const headingRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -73,7 +82,6 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 1000);
     }, 4000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -90,87 +98,47 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
       },
       { threshold: 0.2, rootMargin: '0px 0px -50px 0px' }
     );
-
-    sectionsRef.current.forEach((el) => {
-      if (el) observer.observe(el);
-    });
-    headingRefs.current.forEach((el) => {
-      if (el) observer.observe(el);
-    });
-    experienceCardsRef.current.forEach((el) => {
-      if (el) observer.observe(el);
-    });
-
+    sectionsRef.current.forEach((el) => el && observer.observe(el));
+    headingRefs.current.forEach((el) => el && observer.observe(el));
+    experienceCardsRef.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
-  // Fetch categories and ensure "Watches" and "Rings" exist
   const fetchCategories = async () => {
     setLoadingCategories(true);
     try {
       const { data, error } = await supabase.from('categories').select('*');
       if (error) throw error;
       let cats = data || [];
-
-      // Ensure "Watches" category exists
-      const hasWatches = cats.some(c => c.slug === 'watches');
-      if (!hasWatches) {
-        cats.push({
-          id: 'watches-temp-id',
-          name: 'Watches',
-          slug: 'watches',
-          created_at: new Date().toISOString(),
-        });
-      }
-
-      // Ensure "Rings" category exists
-      const hasRings = cats.some(c => c.slug === 'rings');
-      if (!hasRings) {
-        cats.push({
-          id: 'rings-temp-id',
-          name: 'Rings',
-          slug: 'rings',
-          created_at: new Date().toISOString(),
-        });
-      }
-
+      if (!cats.some(c => c.slug === 'watches')) cats.push({ id: 'watches-temp-id', name: 'Watches', slug: 'watches', created_at: new Date().toISOString() });
+      if (!cats.some(c => c.slug === 'rings')) cats.push({ id: 'rings-temp-id', name: 'Rings', slug: 'rings', created_at: new Date().toISOString() });
       setCategories(cats);
       await fetchCategoryImages(cats);
     } catch (err) {
-      console.error('Error fetching categories:', err);
-      // Fallback: include both Watches and Rings
+      console.error(err);
       setCategories([
         { id: 'fallback-watches', name: 'Watches', slug: 'watches', created_at: new Date().toISOString() },
-        { id: 'fallback-rings', name: 'Rings', slug: 'rings', created_at: new Date().toISOString() },
+        { id: 'fallback-rings', name: 'Rings', slug: 'rings', created_at: new Date().toISOString() }
       ]);
     } finally {
       setLoadingCategories(false);
     }
   };
 
-  const fetchCategoryImages = async (categories: Category[]) => {
+  const fetchCategoryImages = async (cats: Category[]) => {
     const images: Record<string, string> = {};
-    for (const category of categories) {
+    for (const cat of cats) {
       try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('image_url')
-          .eq('category_id', category.id)
-          .limit(1);
-        if (!error && data && data.length > 0) {
-          images[category.id] = data[0].image_url;
+        const { data } = await supabase.from('products').select('image_url').eq('category_id', cat.id).limit(1);
+        if (data && data.length) {
+          images[cat.id] = data[0].image_url;
         } else {
-          // Fallback images per category
-          if (category.slug === 'watches') {
-            images[category.id] = 'https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=800';
-          } else if (category.slug === 'rings') {
-            images[category.id] = 'https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg?auto=compress&cs=tinysrgb&w=800';
-          } else {
-            images[category.id] = 'https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=800';
-          }
+          if (cat.slug === 'watches') images[cat.id] = 'https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=800';
+          else if (cat.slug === 'rings') images[cat.id] = 'https://images.pexels.com/photos/1927259/pexels-photo-1927259.jpeg?auto=compress&cs=tinysrgb&w=800';
+          else images[cat.id] = 'https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=800';
         }
       } catch {
-        images[category.id] = 'https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=800';
+        images[cat.id] = 'https://images.pexels.com/photos/6174221/pexels-photo-6174221.jpeg?auto=compress&cs=tinysrgb&w=800';
       }
     }
     setCategoryImages(images);
@@ -179,98 +147,46 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const fetchFeaturedProducts = async () => {
     setLoadingProducts(true);
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_featured', true)
-        .limit(4);
+      const { data, error } = await supabase.from('products').select('*').eq('is_featured', true).limit(4);
       if (error) throw error;
       if (data) setFeaturedProducts(data);
-    } catch (err) {
-      console.error('Error fetching featured products:', err);
-    } finally {
-      setLoadingProducts(false);
-    }
+    } catch (err) { console.error(err); } finally { setLoadingProducts(false); }
   };
 
   const fetchNewArrivals = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_new_arrival', true)
-        .order('created_at', { ascending: false })
-        .limit(4);
+      const { data, error } = await supabase.from('products').select('*').eq('is_new_arrival', true).order('created_at', { ascending: false }).limit(4);
       if (error) throw error;
       if (data) setNewArrivals(data);
-    } catch (err) {
-      console.error('Error fetching new arrivals:', err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const fetchReviews = async () => {
     setLoadingReviews(true);
     try {
-      const { data, error } = await supabase
-        .from('reviews')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(6);
+      const { data, error } = await supabase.from('reviews').select('*').order('created_at', { ascending: false }).limit(6);
       if (error) throw error;
       if (data) setReviews(data);
-    } catch (err) {
-      console.error('Error fetching reviews:', err);
-    } finally {
-      setLoadingReviews(false);
-    }
+    } catch (err) { console.error(err); } finally { setLoadingReviews(false); }
   };
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 1000);
-  };
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-    setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 1000);
-  };
-
-  const getWhatsAppLink = (product: Product) => {
-    const message = `Hi, I'm interested in ${product.name} (Ksh ${product.price.toLocaleString()})`;
-    return `https://wa.me/254798893450?text=${encodeURIComponent(message)}`;
-  };
-
+  const nextSlide = () => { setCurrentSlide((p) => (p + 1) % heroSlides.length); setIsAnimating(true); setTimeout(() => setIsAnimating(false), 1000); };
+  const prevSlide = () => { setCurrentSlide((p) => (p - 1 + heroSlides.length) % heroSlides.length); setIsAnimating(true); setTimeout(() => setIsAnimating(false), 1000); };
+  const getWhatsAppLink = (product: Product) => `https://wa.me/254798893450?text=${encodeURIComponent(`Hi, I'm interested in ${product.name} (Ksh ${product.price.toLocaleString()})`)}`;
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { name, email, message } = formData;
-    const subject = encodeURIComponent('Inquiry from Boldify website');
-    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-    window.location.href = `mailto:boldifyjewelry@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:boldifyjewelry@gmail.com?subject=${encodeURIComponent('Inquiry from Boldify website')}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
     setFormData({ name: '', email: '', message: '' });
   };
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
-    e.preventDefault();
-    const element = document.getElementById(targetId);
-    if (element) element.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => { e.preventDefault(); document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' }); };
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!heroRef.current) return;
     const rect = heroRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setMousePosition({ x, y });
+    setMousePosition({ x: (e.clientX - rect.left) / rect.width - 0.5, y: (e.clientY - rect.top) / rect.height - 0.5 });
   };
-
-  const navigateToCategory = (categorySlug: string) => {
-    onNavigateToShop(categorySlug);
-  };
+  const navigateToCategory = (slug: string) => onNavigateToShop(slug);
 
   const faqItems = [
     { question: "What materials are your jewellery made of?", answer: "Our pieces are made from high-quality materials such as stainless steel, gold plating, and premium alloys—designed to be durable, stylish, and long-lasting." },
@@ -283,16 +199,36 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
     { question: "How much is delivery?", answer: "Shipping costs vary depending on your location. The exact fee will be shown at checkout." },
     { question: "How can I contact you?", answer: "You can reach us via WhatsApp, Instagram, or email—we’re always happy to help 💕" }
   ];
+  const toggleFaq = (idx: number) => setOpenFaqIndex(openFaqIndex === idx ? null : idx);
 
-  const toggleFaq = (index: number) => {
-    setOpenFaqIndex(openFaqIndex === index ? null : index);
-  };
+  const ProductCard = ({ product, isNew = false }: { product: Product; isNew?: boolean }) => (
+    <div className="group relative cursor-pointer bg-white/80 backdrop-blur-sm border border-[#E5E5E5] hover:border-[#C4A747] transition-all duration-500 hover:shadow-2xl">
+      <div className="relative h-80 overflow-hidden bg-[#FAFAFA]">
+        <img src={product.image_url} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125 will-change-transform" style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.95, 0.4, 1.05)' }} />
+        {isNew && <span className="absolute top-4 left-4 bg-[#C4A747] text-black px-3 py-1 text-xs font-bold tracking-wide z-10">NEW</span>}
+        <button onClick={(e) => toggleWishlist(product.id, e)} className="absolute top-4 right-4 bg-black/50 hover:bg-black p-2 rounded-full transition-colors z-20" aria-label={wishlist.has(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}>
+          <Heart className={`h-5 w-5 ${wishlist.has(product.id) ? 'text-[#C4A747] fill-[#C4A747]' : 'text-white'}`} />
+        </button>
+      </div>
+      <div className="p-6">
+        <h3 className="text-xl font-semibold text-[#1A1A1A] mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>{product.name}</h3>
+        <p className="text-[#666666] text-sm mb-4 line-clamp-2" style={{ fontFamily: 'Marcellus, serif' }}>{product.description}</p>
+        <div className="flex justify-between items-center">
+          <span className="text-2xl font-bold text-[#C4A747]" style={{ fontFamily: 'Jolt, serif' }}>Ksh {product.price.toLocaleString()}</span>
+          <a href={getWhatsAppLink(product)} target="_blank" rel="noopener noreferrer" className="relative overflow-hidden bg-[#1A1A1A] text-white px-5 py-2 text-sm font-bold transition-all duration-300 hover:bg-[#C4A747] hover:text-black group/btn">
+            <span className="relative z-10">ORDER</span>
+            <span className="absolute inset-0 bg-[#C4A747] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#F8F6F2] relative overflow-x-hidden">
       <div className="fixed inset-0 pointer-events-none opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox=%220%200%20200%20200%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter%20id=%22noise%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.65%22%20numOctaves=%223%22%20stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23noise)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:200px]"></div>
 
-      {/* Hero Section (unchanged, omitted for brevity but included in final code) */}
+      {/* Hero Section */}
       <div ref={heroRef} className="relative h-screen overflow-hidden cursor-grab active:cursor-grabbing" onMouseMove={handleMouseMove}>
         {heroSlides.map((slide, index) => {
           const offsetX = index === currentSlide ? mousePosition.x * 40 : 0;
@@ -322,7 +258,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
         </div>
       </div>
 
-      {/* Shop by Category Section */}
+      {/* Shop by Category */}
       <section ref={(el) => (sectionsRef.current[0] = el)} className="py-12 px-6 md:px-12 lg:px-24" style={{ backgroundColor: '#000000' }}>
         <div className="max-w-7xl mx-auto">
           <div ref={(el) => (headingRefs.current[0] = el)} className="mb-12 text-center">
@@ -364,25 +300,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             <div className="text-center py-12"><p className="text-gray-500">Loading products...</p></div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-              {featuredProducts.map((product) => (
-                <div key={product.id} className="group relative cursor-pointer bg-white/80 backdrop-blur-sm border border-[#E5E5E5] hover:border-[#C4A747] transition-all duration-500 hover:shadow-2xl" style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.9, 0.4, 1.1)' }}>
-                  <div className="relative h-80 overflow-hidden bg-[#FAFAFA]">
-                    <img src={product.image_url} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125 will-change-transform" style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.95, 0.4, 1.05)' }} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-[#1A1A1A] mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>{product.name}</h3>
-                    <p className="text-[#666666] text-sm mb-4 line-clamp-2" style={{ fontFamily: 'Marcellus, serif' }}>{product.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-[#C4A747]" style={{ fontFamily: 'Jolt, serif' }}>Ksh {product.price.toLocaleString()}</span>
-                      <a href={getWhatsAppLink(product)} target="_blank" rel="noopener noreferrer" className="relative overflow-hidden bg-[#1A1A1A] text-white px-5 py-2 text-sm font-bold transition-all duration-300 hover:bg-[#C4A747] hover:text-black group/btn">
-                        <span className="relative z-10">ORDER</span>
-                        <span className="absolute inset-0 bg-[#C4A747] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              {featuredProducts.map((product) => <ProductCard key={product.id} product={product} />)}
             </div>
           )}
         </div>
@@ -396,25 +314,7 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             <p className="text-[#4A4A4A] text-lg font-light max-w-2xl mx-auto" style={{ fontFamily: 'Playfair Display, serif' }}>Fresh additions to elevate your collection</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
-            {newArrivals.map((product) => (
-              <div key={product.id} className="group relative cursor-pointer bg-white/80 backdrop-blur-sm border border-[#E5E5E5] hover:border-[#C4A747] transition-all duration-500">
-                <div className="relative h-80 overflow-hidden bg-[#FAFAFA]">
-                  <img src={product.image_url} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125 will-change-transform" />
-                  <span className="absolute top-4 left-4 bg-[#C4A747] text-black px-3 py-1 text-xs font-bold tracking-wide z-10">NEW</span>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-[#1A1A1A] mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>{product.name}</h3>
-                  <p className="text-[#666666] text-sm mb-4 line-clamp-2" style={{ fontFamily: 'Marcellus, serif' }}>{product.description}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-[#C4A747]" style={{ fontFamily: 'Jolt, serif' }}>Ksh {product.price.toLocaleString()}</span>
-                    <a href={getWhatsAppLink(product)} target="_blank" rel="noopener noreferrer" className="relative overflow-hidden bg-[#1A1A1A] text-white px-5 py-2 text-sm font-bold transition-all duration-300 hover:bg-[#C4A747] hover:text-black group/btn">
-                      <span className="relative z-10">ORDER</span>
-                      <span className="absolute inset-0 bg-[#C4A747] translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
+            {newArrivals.map((product) => <ProductCard key={product.id} product={product} isNew />)}
           </div>
         </div>
       </section>
@@ -457,7 +357,9 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {reviews.map((review) => (
                 <div key={review.id} className="bg-white border border-[#E5E5E5] p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:border-[#C4A747]">
-                  <div className="flex mb-4">{[...Array(5)].map((_, i) => (<Star key={i} className={`h-5 w-5 ${i < review.rating ? 'text-[#C4A747] fill-[#C4A747]' : 'text-[#DDD]'}`} />))}</div>
+                  <div className="flex mb-4">
+                    {[...Array(5)].map((_, i) => <Star key={i} className={`h-5 w-5 ${i < review.rating ? 'text-[#C4A747] fill-[#C4A747]' : 'text-[#DDD]'}`} />)}
+                  </div>
                   <p className="text-[#333] mb-6 italic text-base leading-relaxed" style={{ fontFamily: 'Marcellus, serif' }}>"{review.comment}"</p>
                   <p className="text-[#C4A747] font-semibold tracking-wide" style={{ fontFamily: 'Playfair Display, serif' }}>{review.customer_name}</p>
                 </div>
@@ -545,12 +447,20 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
 
       <div className="relative h-24 bg-gradient-to-t from-[#F1EFEA] to-transparent pointer-events-none"></div>
 
+      {/* Footer with updated social links */}
       <footer className="bg-[#1A1A1A] text-white border-t border-[#C4A747]/20 py-12 px-6 md:px-12">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div className="text-center md:text-left"><button onClick={scrollToTop} className="text-2xl font-bold text-[#C4A747] hover:text-white transition-colors duration-300" style={{ fontFamily: 'Jolt, serif' }}>BOLDIFY</button><p className="text-gray-400 text-sm mt-2" style={{ fontFamily: 'Marcellus, serif' }}>Statement jewelry for the bold woman.</p></div>
             <div className="text-center"><h3 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>Quick Links</h3><ul className="space-y-2" style={{ fontFamily: 'Marcellus, serif' }}><li><button onClick={scrollToTop} className="text-gray-400 hover:text-[#C4A747] transition-colors">Home</button></li><li><button onClick={() => onNavigateToShop()} className="text-gray-400 hover:text-[#C4A747] transition-colors">Shop</button></li><li><a href="#about" onClick={(e) => handleAnchorClick(e, 'about')} className="text-gray-400 hover:text-[#C4A747] transition-colors">About</a></li><li><a href="#contact" onClick={(e) => handleAnchorClick(e, 'contact')} className="text-gray-400 hover:text-[#C4A747] transition-colors">Contact</a></li></ul></div>
-            <div className="text-center md:text-right"><h3 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>Follow Us</h3><div className="flex justify-center md:justify-end space-x-4"><a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#C4A747] transition-colors" aria-label="Facebook"><Facebook className="h-5 w-5" /></a><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#C4A747] transition-colors" aria-label="Instagram"><Instagram className="h-5 w-5" /></a><a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#C4A747] transition-colors" aria-label="Twitter"><Twitter className="h-5 w-5" /></a></div></div>
+            <div className="text-center md:text-right"><h3 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>Follow Us</h3><div className="flex justify-center md:justify-end space-x-4">
+              {/* Instagram uses provided Instagram URL */}
+              <a href="https://www.instagram.com/boldify_jewellery.ke?utm_source=qr&igsh=cTZ4c2ljcmRoNTJs" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#C4A747] transition-colors" aria-label="Instagram"><Instagram className="h-5 w-5" /></a>
+              {/* Facebook icon now uses TikTok URL as requested */}
+              <a href="https://www.tiktok.com/@boldify_jewellery?_r=1&_t=ZS-94PQWhub0XR" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#C4A747] transition-colors" aria-label="TikTok"><Facebook className="h-5 w-5" /></a>
+              {/* Twitter icon remains unused but present; you can remove or keep */}
+              <a href="#" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#C4A747] transition-colors" aria-label="Twitter"><Twitter className="h-5 w-5" /></a>
+            </div></div>
           </div>
           <div className="border-t border-gray-800 pt-6 text-center"><p className="text-gray-500 text-sm" style={{ fontFamily: 'Marcellus, serif' }}>© 2026 Boldify Jewelry.Ke. All rights reserved.</p></div>
         </div>
