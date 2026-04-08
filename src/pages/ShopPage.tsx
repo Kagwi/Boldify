@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, X, Heart, Filter } from 'lucide-react';
+import { Search, X, Heart, Filter, Instagram, Facebook } from 'lucide-react';  // ← added Instagram and Facebook
 import { supabase, Product, Category, Subcategory } from '../lib/supabase';
 
 interface ShopPageProps {
-  onWishlistChange?: (count: number) => void;   // optional now
+  onWishlistChange?: (count: number) => void;
   initialCategory?: string | null;
 }
 
@@ -227,8 +227,12 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
       <footer className="bg-black border-t border-gold/20 py-8 px-4 mt-20">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex justify-center space-x-6 mb-4">
-            <a href="https://www.instagram.com/boldify_jewellery.ke?utm_source=qr&igsh=cTZ4c2ljcmRoNTJs" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors" aria-label="Instagram"><Instagram className="h-5 w-5" /></a>
-            <a href="https://www.tiktok.com/@boldify_jewellery?_r=1&_t=ZS-94PQWhub0XR" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors" aria-label="TikTok"><Facebook className="h-5 w-5" /></a>
+            <a href="https://www.instagram.com/boldify_jewellery.ke?utm_source=qr&igsh=cTZ4c2ljcmRoNTJs" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors" aria-label="Instagram">
+              <Instagram className="h-5 w-5" />
+            </a>
+            <a href="https://www.tiktok.com/@boldify_jewellery?_r=1&_t=ZS-94PQWhub0XR" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors" aria-label="TikTok">
+              <Facebook className="h-5 w-5" />
+            </a>
           </div>
           <p className="text-gray-400" style={{ fontFamily: 'Marcellus, serif' }}>© 2026 Boldify Jewellery.Ke. All rights reserved.</p>
         </div>
