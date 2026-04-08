@@ -3,8 +3,7 @@ import { ChevronLeft, ChevronRight, Star, Phone, Mail, MessageCircle, Send, Gem,
 import { supabase, Product, Review, Category } from '../lib/supabase';
 
 interface HomePageProps {
-  onNavigateToShop?: (categorySlug?: string) => void;   // optional now
-  onWishlistChange?: (count: number) => void;          // optional now
+  onNavigateToShop?: (categorySlug?: string) => void;
 }
 
 const heroSlides = [
@@ -16,7 +15,7 @@ const heroSlides = [
   { image: 'https://github.com/Kagwi/Boldify/blob/main/public/images/WhatsApp%20Image%202026-03-28%20at%2000.05.21.jpeg?raw=true', title: 'Uniquely Yours', subtitle: 'Celebrate Your Individuality' },
 ];
 
-export default function HomePage({ onNavigateToShop, onWishlistChange }: HomePageProps) {
+export default function HomePage({ onNavigateToShop }: HomePageProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
@@ -42,17 +41,17 @@ export default function HomePage({ onNavigateToShop, onWishlistChange }: HomePag
       try {
         const arr = JSON.parse(saved);
         setWishlist(new Set(arr));
-        if (onWishlistChange) onWishlistChange(arr.length);
       } catch (e) {}
     }
-  }, [onWishlistChange]);
+  }, []);
 
-  // Save wishlist to localStorage and notify parent
+  // Save wishlist to localStorage and dispatch event
   useEffect(() => {
     const arr = Array.from(wishlist);
     localStorage.setItem('boldify_wishlist', JSON.stringify(arr));
-    if (onWishlistChange) onWishlistChange(arr.length);
-  }, [wishlist, onWishlistChange]);
+    // Notify other components (Navbar) that wishlist changed
+    window.dispatchEvent(new Event('wishlistUpdated'));
+  }, [wishlist]);
 
   const toggleWishlist = (productId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -226,7 +225,7 @@ export default function HomePage({ onNavigateToShop, onWishlistChange }: HomePag
     </div>
   );
 
-  // ---- JSX (full – same as before, only the shop button now calls safely) ----
+  // Return JSX (full – same as before, only the shop button now calls safely)
   return (
     <div className="min-h-screen bg-[#F8F6F2] relative overflow-x-hidden">
       <div className="fixed inset-0 pointer-events-none opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox=%220%200%20200%20200%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter%20id=%22noise%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.65%22%20numOctaves=%223%22%20stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23noise)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:200px]"></div>
