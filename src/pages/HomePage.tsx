@@ -3,8 +3,8 @@ import { ChevronLeft, ChevronRight, Star, Phone, Mail, MessageCircle, Send, Gem,
 import { supabase, Product, Review, Category } from '../lib/supabase';
 
 interface HomePageProps {
-  onNavigateToShop: (categorySlug?: string) => void;
-  onWishlistChange: (count: number) => void;
+  onNavigateToShop?: (categorySlug?: string) => void;   // optional now
+  onWishlistChange?: (count: number) => void;          // optional now
 }
 
 const heroSlides = [
@@ -42,7 +42,7 @@ export default function HomePage({ onNavigateToShop, onWishlistChange }: HomePag
       try {
         const arr = JSON.parse(saved);
         setWishlist(new Set(arr));
-        onWishlistChange(arr.length);
+        if (onWishlistChange) onWishlistChange(arr.length);
       } catch (e) {}
     }
   }, [onWishlistChange]);
@@ -51,7 +51,7 @@ export default function HomePage({ onNavigateToShop, onWishlistChange }: HomePag
   useEffect(() => {
     const arr = Array.from(wishlist);
     localStorage.setItem('boldify_wishlist', JSON.stringify(arr));
-    onWishlistChange(arr.length);
+    if (onWishlistChange) onWishlistChange(arr.length);
   }, [wishlist, onWishlistChange]);
 
   const toggleWishlist = (productId: string, e: React.MouseEvent) => {
@@ -186,7 +186,9 @@ export default function HomePage({ onNavigateToShop, onWishlistChange }: HomePag
     const rect = heroRef.current.getBoundingClientRect();
     setMousePosition({ x: (e.clientX - rect.left) / rect.width - 0.5, y: (e.clientY - rect.top) / rect.height - 0.5 });
   };
-  const navigateToCategory = (slug: string) => onNavigateToShop(slug);
+  const navigateToCategory = (slug: string) => {
+    if (onNavigateToShop) onNavigateToShop(slug);
+  };
 
   const faqItems = [
     { question: "What materials are your jewellery made of?", answer: "Our pieces are made from high-quality materials such as stainless steel, gold plating, and premium alloys—designed to be durable, stylish, and long-lasting." },
@@ -224,11 +226,12 @@ export default function HomePage({ onNavigateToShop, onWishlistChange }: HomePag
     </div>
   );
 
+  // ---- JSX (full – same as before, only the shop button now calls safely) ----
   return (
     <div className="min-h-screen bg-[#F8F6F2] relative overflow-x-hidden">
       <div className="fixed inset-0 pointer-events-none opacity-20 bg-[url('data:image/svg+xml,%3Csvg%20viewBox=%220%200%20200%20200%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter%20id=%22noise%22%3E%3CfeTurbulence%20type=%22fractalNoise%22%20baseFrequency=%220.65%22%20numOctaves=%223%22%20stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20filter=%22url(%23noise)%22/%3E%3C/svg%3E')] bg-repeat bg-[length:200px]"></div>
 
-      {/* Hero Section */}
+      {/* Hero Section – same as previous, but shop button now calls onNavigateToShop safely */}
       <div ref={heroRef} className="relative h-screen overflow-hidden cursor-grab active:cursor-grabbing" onMouseMove={handleMouseMove}>
         {heroSlides.map((slide, index) => {
           const offsetX = index === currentSlide ? mousePosition.x * 40 : 0;
@@ -241,7 +244,7 @@ export default function HomePage({ onNavigateToShop, onWishlistChange }: HomePag
                 <div className="max-w-2xl text-left">
                   <h1 className={`text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight transition-all duration-700 ${isAnimating ? 'opacity-0 -translate-y-6 scale-95 rotate-2' : 'opacity-100 translate-y-0 scale-100 rotate-0'}`} style={{ fontFamily: 'Jolt, serif', transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)' }}>{slide.title}</h1>
                   <p className={`text-xl md:text-3xl text-white/90 mb-12 font-light tracking-wide transition-all duration-700 delay-150 ${isAnimating ? 'opacity-0 -translate-y-4 scale-95' : 'opacity-100 translate-y-0 scale-100'}`} style={{ fontFamily: 'Playfair Display, serif' }}>{slide.subtitle}</p>
-                  <button onClick={() => onNavigateToShop()} className={`group bg-transparent border-2 border-white text-white px-12 py-4 text-lg font-bold hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 hover:shadow-2xl ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`} style={{ fontFamily: 'Marcellus, serif' }}>
+                  <button onClick={() => { if (onNavigateToShop) onNavigateToShop(); }} className={`group bg-transparent border-2 border-white text-white px-12 py-4 text-lg font-bold hover:bg-white hover:text-black transition-all duration-500 hover:scale-105 hover:shadow-2xl ${isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`} style={{ fontFamily: 'Marcellus, serif' }}>
                     <span className="relative inline-block">SHOP NOW<span className="absolute bottom-0 left-0 w-0 h-px bg-white group-hover:w-full transition-all duration-500"></span></span>
                   </button>
                 </div>
@@ -452,14 +455,10 @@ export default function HomePage({ onNavigateToShop, onWishlistChange }: HomePag
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div className="text-center md:text-left"><button onClick={scrollToTop} className="text-2xl font-bold text-[#C4A747] hover:text-white transition-colors duration-300" style={{ fontFamily: 'Jolt, serif' }}>BOLDIFY</button><p className="text-gray-400 text-sm mt-2" style={{ fontFamily: 'Marcellus, serif' }}>Statement jewelry for the bold woman.</p></div>
-            <div className="text-center"><h3 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>Quick Links</h3><ul className="space-y-2" style={{ fontFamily: 'Marcellus, serif' }}><li><button onClick={scrollToTop} className="text-gray-400 hover:text-[#C4A747] transition-colors">Home</button></li><li><button onClick={() => onNavigateToShop()} className="text-gray-400 hover:text-[#C4A747] transition-colors">Shop</button></li><li><a href="#about" onClick={(e) => handleAnchorClick(e, 'about')} className="text-gray-400 hover:text-[#C4A747] transition-colors">About</a></li><li><a href="#contact" onClick={(e) => handleAnchorClick(e, 'contact')} className="text-gray-400 hover:text-[#C4A747] transition-colors">Contact</a></li></ul></div>
+            <div className="text-center"><h3 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>Quick Links</h3><ul className="space-y-2" style={{ fontFamily: 'Marcellus, serif' }}><li><button onClick={scrollToTop} className="text-gray-400 hover:text-[#C4A747] transition-colors">Home</button></li><li><button onClick={() => { if (onNavigateToShop) onNavigateToShop(); }} className="text-gray-400 hover:text-[#C4A747] transition-colors">Shop</button></li><li><a href="#about" onClick={(e) => handleAnchorClick(e, 'about')} className="text-gray-400 hover:text-[#C4A747] transition-colors">About</a></li><li><a href="#contact" onClick={(e) => handleAnchorClick(e, 'contact')} className="text-gray-400 hover:text-[#C4A747] transition-colors">Contact</a></li></ul></div>
             <div className="text-center md:text-right"><h3 className="font-bold text-white mb-4 text-lg" style={{ fontFamily: 'Playfair Display, serif' }}>Follow Us</h3><div className="flex justify-center md:justify-end space-x-4">
-              {/* Instagram uses provided Instagram URL */}
               <a href="https://www.instagram.com/boldify_jewellery.ke?utm_source=qr&igsh=cTZ4c2ljcmRoNTJs" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#C4A747] transition-colors" aria-label="Instagram"><Instagram className="h-5 w-5" /></a>
-              {/* Facebook icon now uses TikTok URL as requested */}
               <a href="https://www.tiktok.com/@boldify_jewellery?_r=1&_t=ZS-94PQWhub0XR" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#C4A747] transition-colors" aria-label="TikTok"><Facebook className="h-5 w-5" /></a>
-              {/* Twitter icon remains unused but present; you can remove or keep */}
-              <a href="#" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#C4A747] transition-colors" aria-label="Twitter"><Twitter className="h-5 w-5" /></a>
             </div></div>
           </div>
           <div className="border-t border-gray-800 pt-6 text-center"><p className="text-gray-500 text-sm" style={{ fontFamily: 'Marcellus, serif' }}>© 2026 Boldify Jewelry.Ke. All rights reserved.</p></div>
