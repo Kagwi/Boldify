@@ -3,7 +3,7 @@ import { Search, X, Heart, Filter } from 'lucide-react';
 import { supabase, Product, Category, Subcategory } from '../lib/supabase';
 
 interface ShopPageProps {
-  onWishlistChange: (count: number) => void;
+  onWishlistChange?: (count: number) => void;   // optional now
   initialCategory?: string | null;
 }
 
@@ -27,7 +27,7 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
       try {
         const arr = JSON.parse(saved);
         setWishlist(new Set(arr));
-        onWishlistChange(arr.length);
+        if (onWishlistChange) onWishlistChange(arr.length);
       } catch (e) {}
     }
   }, [onWishlistChange]);
@@ -35,7 +35,7 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
   useEffect(() => {
     const arr = Array.from(wishlist);
     localStorage.setItem('boldify_wishlist', JSON.stringify(arr));
-    onWishlistChange(arr.length);
+    if (onWishlistChange) onWishlistChange(arr.length);
   }, [wishlist, onWishlistChange]);
 
   const toggleWishlist = (productId: string, e: React.MouseEvent) => {
@@ -224,7 +224,6 @@ export default function ShopPage({ onWishlistChange, initialCategory }: ShopPage
         )}
       </div>
 
-      {/* Footer with updated social links */}
       <footer className="bg-black border-t border-gold/20 py-8 px-4 mt-20">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex justify-center space-x-6 mb-4">
