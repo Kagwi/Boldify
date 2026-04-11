@@ -184,6 +184,19 @@ export default function ShopPage({ initialCategory }: ShopPageProps) {
           </div>
           <p className="text-gray-400">© 2026 Boldify Jewellery.Ke. All rights reserved.</p>
         </div>
+        <div className="text-center mt-4 pt-4 border-t border-gray-800">
+  <p className="text-gray-500 text-xs" style={{ fontFamily: 'Marcellus, serif' }}>
+    Created and Designed by{' '}
+    <a 
+      href="https://www.neonsolcreatives.com" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="text-[#C4A747] hover:text-gold transition-colors duration-300"
+    >
+      Neonsol Creatives
+    </a>
+  </p>
+</div>
       </footer>
     </div>
   );
