@@ -465,6 +465,19 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
           </div>
           <div className="border-t border-gray-800 pt-6 text-center"><p className="text-gray-500 text-sm" style={{ fontFamily: 'Marcellus, serif' }}>© 2026 Boldify Jewelry.Ke. All rights reserved.</p></div>
         </div>
+        <div className="text-center mt-4 pt-4 border-t border-gray-800">
+  <p className="text-gray-500 text-xs" style={{ fontFamily: 'Marcellus, serif' }}>
+    Created and Designed by{' '}
+    <a 
+      href="https://www.neonsolcreatives.com" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="text-[#C4A747] hover:text-gold transition-colors duration-300"
+    >
+      Neonsol Creatives
+    </a>
+  </p>
+</div>
       </footer>
 
       <style>{`
