@@ -469,12 +469,12 @@ export default function HomePage({ onNavigateToShop }: HomePageProps) {
   <p className="text-gray-500 text-xs" style={{ fontFamily: 'Marcellus, serif' }}>
     Created and Designed by{' '}
     <a 
-      href="https://www.neonsolcreatives.com" 
+      href="https://www.neonsolcreatives.co.ke" 
       target="_blank" 
       rel="noopener noreferrer"
       className="text-[#C4A747] hover:text-gold transition-colors duration-300"
     >
-      Neonsol Creatives
+      Created & Designed by Neonsol Creatives
     </a>
   </p>
 </div>
