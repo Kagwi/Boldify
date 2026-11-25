@@ -188,7 +188,7 @@ export default function ShopPage({ initialCategory }: ShopPageProps) {
   <p className="text-gray-500 text-xs" style={{ fontFamily: 'Marcellus, serif' }}>
     Created and Designed by{' '}
     <a 
-      href="https://www.neonsolcreatives.com" 
+      href="https://www.neonsolcreatives.co.ke" 
       target="_blank" 
       rel="noopener noreferrer"
       className="text-[#C4A747] hover:text-gold transition-colors duration-300"
